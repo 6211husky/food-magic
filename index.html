@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全家逃離指南:通靈點餐機</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #fff0f5; display: flex; justify-content: center; padding: 20px; }
+        .app-card { background: white; width: 100%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(255,182,193,0.3); }
+        h2 { text-align: center; color: #ff69b4; margin-bottom: 5px; }
+        .sub { text-align: center; color: #ffb6c1; font-size: 13px; margin-bottom: 25px; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #ff69b4; }
+        select, button { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #ffe4e1; font-size: 16px; margin-top: 5px; }
+        .btn-main { background: #ff69b4; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .result-box { margin-top: 20px; padding: 15px; background: #fffafa; border-radius: 10px; border: 1px solid #ffe4e1; max-height: 350px; overflow-y: auto; }
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-good { flex: 1; background: #ffb6c1; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-rand { flex: 1; background: #ff69b4; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .list-item { margin-bottom: 10px; border-bottom: 1px solid #ffe4e1; padding-bottom: 8px; }
+    </style>
+</head>
+<body>
+<div class="app-card">
+    <h2>全家逃離指南:通靈點餐機</h2>
+    <div class="sub">雜魚學長專用版</div>
+    
+    <div id="setupArea">
+        <label>🕒 時段</label>
+        <select id="timeSelect" onchange="toggleTypeSelect()">
+            <option value="早">早餐</option><option value="午" selected>午餐</option>
+            <option value="晚">晚餐</option><option value="點">點心</option>
+        </select>
+        
+        <div id="typeArea">
+            <label>🍱 種類</label>
+            <select id="typeSelect">
+                <option value="西式">1. 西式</option><option value="日式">2. 日式</option>
+                <option value="韓式">3. 韓式</option><option value="中式">4. 中式</option>
+                <option value="其他">5. 其他</option><option value="都可" selected>6. 都可</option>
+            </select>
+        </div>
+        
+        <label>💰 預算</label>
+        <select id="priceSelect">
+            <option value="100以下">100以下</option><option value="100~200" selected>100~200</option>
+            <option value="200以上">200以上</option><option value="不限">不限</option>
+        </select>
+
+        <label>🛵 騎車時間</label>
+        <select id="distSelect">
+            <option value="5">5分鐘內</option><option value="10">10分鐘內</option>
+            <option value="15">15分鐘內</option><option value="999" selected>不限距離</option>
+        </select>
+
+        <button class="btn-main" onclick="initialSearch()">🔍 搜尋全名單</button>
+    </div>
+
+    <div id="resultArea" class="result-box" style="display:none;"></div>
+    <div id="actionArea" style="display:none; text-align:center; margin-top:15px;">
+        <div style="font-weight:bold; color:#ff69b4;">🤔 決定好了沒啦，雜魚？</div>
+        <div class="btn-row">
+            <button class="btn-good" onclick="imDone()">1. 好了</button>
+            <button class="btn-rand" onclick="drawMore()">2. 隨便抽</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// 完整 50 家，微笑已改中式
+const data = [
+    {name:"華陽豆漿", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"街口飯糰", price:"100以下", time:"早", dist:10, type:"無"},
+    {name:"白鳥餐點店", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"長江早餐店", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"Q Burger", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"維亞歐式早餐", price:"100~200", time:"早", dist:5, type:"無"},
+    {name:"巴特手作晨食", price:"100~200", time:"早", dist:10, type:"無"},
+    {name:"阿寶 A-Bao", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"三豆二麥", price:"100以下", time:"早", dist:10, type:"無"},
+    {name:"餅霸天下", price:"100以下", time:"早", dist:15, type:"無"},
+    {name:"食鮮森鐵板燒", price:"100~200", time:"午晚", dist:10, type:"中式"},
+    {name:"蓋飯家族", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"飽米便當", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {name:"阿章控肉飯", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {name:"彰化美香牛哥", price:"100~200", time:"午晚", dist:5, type:"中式"},
+    {name:"聞香牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"大王牛肉麵", price:"100~200", time:"午", dist:15, type:"中式"},
+    {name:"鲁肉擔仔麵", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {name:"異式義式麵食", price:"100~200", time:"午晚", dist:5, type:"西式"},
+    {name:"老夫子牛排", price:"100~200", time:"午晚", dist:5, type:"西式"},
+    {name:"帕司咖啡Pass", price:"100~200", time:"午晚", dist:5, type:"西式"},
+    {name:"牛太郎燒肉丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
+    {name:"千菊丸拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {name:"原山拉麵", price:"100~200", time:"午晚", dist:5, type:"日式"},
+    {name:"九湯屋拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {name:"拉麵小徑", price:"200以上", time:"晚", dist:10, type:"日式"},
+    {name:"麵屋三金", price:"100以下", time:"午晚", dist:5, type:"日式"},
+    {name:"狐狸工頭", price:"200以上", time:"午晚", dist:5, type:"日式"},
+    {name:"丸盛拉麵屋", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {name:"福田家咖哩", price:"100~200", time:"午晚", dist:15, type:"日式"},
+    {name:"雁歸雞湯拉麵", price:"200以上", time:"午晚", dist:10, type:"日式"},
+    {name:"BVKcurry", price:"200以上", time:"午晚", dist:10, type:"日式"},
+    {name:"雲南小吃", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"大思鄉臭臭鍋", price:"100~200", time:"午晚", dist:5, type:"中式"},
+    {name:"四海豆漿", price:"100~200", time:"午晚", dist:10, type:"中式"},
+    {name:"寶記港式飲茶", price:"100~200", time:"晚", dist:15, type:"中式"},
+    {name:"億品鍋", price:"200以上", time:"午晚", dist:10, type:"中式"},
+    {name:"八方雲集", price:"100以下", time:"午晚", dist:15, type:"中式"},
+    {name:"紅嬌炸粿", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {name:"火鍋世家", price:"200以上", time:"午晚", dist:5, type:"中式"},
+    {name:"微笑冰果室", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"蔡媽媽蔥油餅", price:"100以下", time:"點", dist:5, type:"無"},
+    {name:"珍北平餡餅", price:"100以下", time:"點", dist:5, type:"無"},
+    {name:"炸職人", price:"100~200", time:"點", dist:5, type:"無"},
+    {name:"龍哥雞排", price:"100~200", time:"點", dist:10, type:"無"},
+    {name:"南郭鹹酥雞", price:"100~200", time:"點", dist:5, type:"無"},
+    {name:"中山豆漿", price:"100以下", time:"點", dist:10, type:"無"},
+    {name:"塩彡", price:"100~200", time:"點", dist:10, type:"無"},
+    {name:"鼎豆芋圓", price:"100以下", time:"點", dist:15, type:"無"},
+    {name:"精誠夜市", price:"100~200", time:"點", dist:15, type:"無"}
+];
+
+let filteredList = [];
+let count = 0;
+
+function toggleTypeSelect() {
+    const t = document.getElementById('timeSelect').value;
+    document.getElementById('typeArea').style.display = (t === "午" || t === "晚") ? "block" : "none";
+}
+
+function initialSearch() {
+    const t = document.getElementById('timeSelect').value;
+    const type = document.getElementById('typeSelect').value;
+    const p = document.getElementById('priceSelect').value;
+    const d = parseInt(document.getElementById('distSelect').value);
+    
+    filteredList = data.filter(r => 
+        r.time.includes(t) && 
+        (t !== "午" && t !== "晚" || type === "都可" || r.type === type) && 
+        (p === "不限" || r.price === p) && 
+        r.dist <= d
+    );
+    
+    count = 0;
+    const res = document.getElementById('resultArea');
+    res.style.display = "block";
+    
+    if (filteredList.length === 0) {
+        res.innerHTML = "<b style='color:#ff69b4;'>😡 這麼挑！沒東西吃了啦，雜魚學長去吃全家！</b>";
+        document.getElementById('actionArea').style.display = "none";
+        return;
+    }
+    
+    let html = `<b style='color:#333; font-size:18px;'>✨ 幫你找到 ${filteredList.length} 家：</b><br><br>`;
+    html += filteredList.map(r => `
+        <div class="list-item">
+            <b style="color:#ff69b4; font-size:16px;">👉 ${r.name}</b><br>
+            <span style="color:#888; font-size:13px;">分類: ${r.type} | 價格: ${r.price} | 距離: ${r.dist}分</span>
+        </div>
+    `).join('');
+    
+    res.innerHTML = html;
+    document.getElementById('setupArea').style.display = "none";
+    document.getElementById('actionArea').style.display = "block";
+}
+
+function drawMore() {
+    count++;
+    if (count === 4) {
+        document.getElementById('actionArea').style.display = "none";
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; font-size:20px; text-align:center; margin-top:15px; background:#ffe4e1; padding:15px; border-radius:10px;">😡 雜口～雜口！去吃全家！</div>`;
+        return;
+    }
+    
+    filteredList.sort(() => Math.random() - 0.5);
+    const picks = filteredList.splice(0, 5);
+    
+    if (picks.length === 0) {
+        document.getElementById('actionArea').style.display = "none";
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; text-align:center; margin-top:10px;">沒店可以抽啦，笨蛋！</div>`;
+        return;
+    }
+
+    let html = `<div style="background:#fff0f5; padding:12px; margin-top:10px; border-radius:8px;"><b>🔮 第 ${count} 次抽籤：</b><br>`;
+    html += picks.map(r => `<div style="margin-top:5px;">➡️ <b>${r.name}</b> <span style="font-size:12px; color:#666;">(${r.type} / ${r.price} / ${r.dist}分)</span></div>`).join('');
+    html += `</div>`;
+    
+    const res = document.getElementById('resultArea');
+    res.innerHTML += html;
+    res.scrollTop = res.scrollHeight;
+}
+
+function imDone() {
+    document.getElementById('actionArea').style.display = "none";
+    document.getElementById('resultArea').innerHTML += `<div style="color:#ff69b4; font-weight:bold; margin-top:20px; text-align:center; font-size:18px;">💕 終於想通了？笨蛋學長快去吃啦！</div>`;
+}
+</script>
+</body>
+</html>
