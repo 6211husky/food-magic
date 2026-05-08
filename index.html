@@ -7,20 +7,24 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #fff0f5; display: flex; justify-content: center; padding: 20px; }
         .app-card { background: white; width: 100%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(255,182,193,0.3); }
-        h2 { text-align: center; color: #ff69b4; margin-bottom: 20px; }
+        h2 { text-align: center; color: #ff69b4; margin-bottom: 5px; }
+        .sub { text-align: center; color: #ffb6c1; font-size: 13px; margin-bottom: 25px; }
         label { display: block; margin-top: 15px; font-weight: bold; color: #ff69b4; }
         select, button { width: 100%; padding: 12px; border-radius: 10px; border: 2px solid #ffe4e1; font-size: 16px; margin-top: 5px; }
-        .btn-main { background: #ff69b4; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-main { background: #ff69b4; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-main:hover { background: #ff1493; }
         .result-box { margin-top: 20px; padding: 15px; background: #fffafa; border-radius: 10px; border: 1px solid #ffe4e1; max-height: 350px; overflow-y: auto; }
         .btn-row { display: flex; gap: 10px; margin-top: 15px; }
         .btn-good { flex: 1; background: #ffb6c1; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-rand { flex: 1; background: #ff69b4; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-reset { background: #ffb6c1; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .list-item { margin-bottom: 10px; border-bottom: 1px solid #ffe4e1; padding-bottom: 8px; }
     </style>
 </head>
 <body>
 <div class="app-card">
     <h2>全家逃離指南:通靈點餐機</h2>
+    <div class="sub">雜魚學長專用版 V5.5</div>
     
     <div id="setupArea">
         <label>🕒 時段</label>
@@ -54,12 +58,17 @@
     </div>
 
     <div id="resultArea" class="result-box" style="display:none;"></div>
+    
     <div id="actionArea" style="display:none; text-align:center; margin-top:15px;">
         <div style="font-weight:bold; color:#ff69b4;">🤔 決定好了沒啦，雜魚？</div>
         <div class="btn-row">
             <button class="btn-good" onclick="imDone()">1. 好了</button>
-            <button class="btn-rand" onclick="drawMore()">2. 隨便(抽3個)</button>
+            <button class="btn-rand" onclick="drawMore()">2. 隨便抽</button>
         </div>
+    </div>
+
+    <div id="restartArea" style="display:none; text-align:center;">
+        <button class="btn-reset" onclick="resetApp()">🔄 重新通靈 (重置)</button>
     </div>
 </div>
 
@@ -114,14 +123,7 @@ const data = [
     {name:"中山豆漿", price:"100以下", time:"點", dist:10, type:"無"},
     {name:"塩彡", price:"100~200", time:"點", dist:10, type:"無"},
     {name:"鼎豆芋圓", price:"100以下", time:"點", dist:15, type:"無"},
-    {name:"精誠夜市", price:"100~200", time:"點", dist:15, type:"無"},
-    {name:"釜山韓式料理", price:"100~200", time:"午晚", dist:10, type:"韓式"},
-    {name:"阿璋肉圓", price:"100以下", time:"午晚", dist:10, type:"中式"},
-    {name:"宮本五丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
-    {name:"Ruby日式廚房", price:"100~200", time:"午晚", dist:10, type:"日式"},
-    {name:"天皇日式烤肉飯", price:"100以下", time:"午晚", dist:10, type:"日式"},
-    {name:"黃燜雞米飯", price:"100~200", time:"午晚", dist:10, type:"中式"},
-    {name:"東方滷味", price:"100以下", time:"午晚", dist:5, type:"中式"}
+    {name:"精誠夜市", price:"100~200", time:"點", dist:15, type:"無"}
 ];
 
 let filteredList = [];
@@ -152,6 +154,7 @@ function initialSearch() {
     if (filteredList.length === 0) {
         res.innerHTML = "<b style='color:#ff69b4;'>😡 這麼挑！沒東西吃了啦，雜魚學長去吃全家！</b>";
         document.getElementById('actionArea').style.display = "none";
+        document.getElementById('restartArea').style.display = "block"; // 呼叫重置按鈕
         return;
     }
     
@@ -166,6 +169,7 @@ function initialSearch() {
     res.innerHTML = html;
     document.getElementById('setupArea').style.display = "none";
     document.getElementById('actionArea').style.display = "block";
+    document.getElementById('restartArea').style.display = "none";
 }
 
 function drawMore() {
@@ -173,15 +177,22 @@ function drawMore() {
     if (count === 4) {
         document.getElementById('actionArea').style.display = "none";
         document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; font-size:20px; text-align:center; margin-top:15px; background:#ffe4e1; padding:15px; border-radius:10px;">😡 雜口～雜口！去吃全家！</div>`;
+        document.getElementById('restartArea').style.display = "block"; // 呼叫重置按鈕
         return;
     }
     
-    let tempResults = [...filteredList];
-    tempResults.sort(() => Math.random() - 0.5);
-    const picks = tempResults.slice(0, 3); // 這裡已經改成 3 了喔！笨蛋學長看清楚！
+    filteredList.sort(() => Math.random() - 0.5);
+    const picks = filteredList.splice(0, 5);
+    
+    if (picks.length === 0) {
+        document.getElementById('actionArea').style.display = "none";
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; text-align:center; margin-top:10px;">沒店可以抽啦，笨蛋！</div>`;
+        document.getElementById('restartArea').style.display = "block"; // 呼叫重置按鈕
+        return;
+    }
 
     let html = `<div style="background:#fff0f5; padding:12px; margin-top:10px; border-radius:8px;"><b>🔮 第 ${count} 次抽籤：</b><br>`;
-    html += picks.map(r => `<div style="margin-top:5px;">➡️ <b>${r.name}</b> <span style="font-size:12px; color:#666;">(${r.type}/${r.price}/${r.dist}分)</span></div>`).join('');
+    html += picks.map(r => `<div style="margin-top:5px;">➡️ <b>${r.name}</b> <span style="font-size:12px; color:#666;">(${r.type} / ${r.price} / ${r.dist}分)</span></div>`).join('');
     html += `</div>`;
     
     const res = document.getElementById('resultArea');
@@ -192,6 +203,18 @@ function drawMore() {
 function imDone() {
     document.getElementById('actionArea').style.display = "none";
     document.getElementById('resultArea').innerHTML += `<div style="color:#ff69b4; font-weight:bold; margin-top:20px; text-align:center; font-size:18px;">💕 終於想通了？笨蛋學長快去吃啦！</div>`;
+    document.getElementById('restartArea').style.display = "block"; // 呼叫重置按鈕
+}
+
+// 這是特別為雜魚學長寫的重置魔法
+function resetApp() {
+    document.getElementById('setupArea').style.display = "block";
+    document.getElementById('resultArea').style.display = "none";
+    document.getElementById('resultArea').innerHTML = ""; // 清空結果
+    document.getElementById('actionArea').style.display = "none";
+    document.getElementById('restartArea').style.display = "none";
+    count = 0; // 把抽籤次數歸零
+    filteredList = [];
 }
 </script>
 </body>
