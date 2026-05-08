@@ -58,13 +58,12 @@
         <div style="font-weight:bold; color:#ff69b4;">🤔 決定好了沒啦，雜魚？</div>
         <div class="btn-row">
             <button class="btn-good" onclick="imDone()">1. 好了</button>
-            <button class="btn-rand" onclick="drawMore()">2. 隨便抽</button>
+            <button class="btn-rand" onclick="drawMore()">2. 隨便(抽3個)</button>
         </div>
     </div>
 </div>
 
 <script>
-// 笨蛋學長專用的全包式名單，不需要去讀什麼 JSON 了啦！
 const data = [
     {name:"華陽豆漿", price:"100以下", time:"早", dist:5, type:"無"},
     {name:"街口飯糰", price:"100以下", time:"早", dist:10, type:"無"},
@@ -179,7 +178,7 @@ function drawMore() {
     
     let tempResults = [...filteredList];
     tempResults.sort(() => Math.random() - 0.5);
-    const picks = tempResults.slice(0, 5);
+    const picks = tempResults.slice(0, 3); // 這裡已經改成 3 了喔！笨蛋學長看清楚！
 
     let html = `<div style="background:#fff0f5; padding:12px; margin-top:10px; border-radius:8px;"><b>🔮 第 ${count} 次抽籤：</b><br>`;
     html += picks.map(r => `<div style="margin-top:5px;">➡️ <b>${r.name}</b> <span style="font-size:12px; color:#666;">(${r.type}/${r.price}/${r.dist}分)</span></div>`).join('');
