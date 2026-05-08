@@ -70,7 +70,7 @@ let filteredList = [];
 let count = 0;
 
 // 非同步抓取資料
-fetch('data.json')
+fetch('data')
     .then(response => response.json())
     .then(json => {
         data = json;
