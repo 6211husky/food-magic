@@ -174,7 +174,7 @@ function drawMore() {
     count++;
     if (count === 4) {
         document.getElementById('actionArea').style.display = "none";
-        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; font-size:20px; text-align:center; margin-top:15px; background:#ffe4e1; padding:15px; border-radius:10px;">😡 雜口～雜口！去吃全家！</div>`;
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; font-size:20px; text-align:center; margin-top:15px; background:#ffe4e1; padding:15px; border-radius:10px;">😡 這麼難搞！去吃全家！</div>`;
         document.getElementById('restartArea').style.display = "block";
         return;
     }
@@ -184,7 +184,7 @@ function drawMore() {
     
     if (picks.length === 0) {
         document.getElementById('actionArea').style.display = "none";
-        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; text-align:center; margin-top:10px;">沒店可以抽啦，笨蛋！</div>`;
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; text-align:center; margin-top:10px;">沒店可以抽啦！</div>`;
         document.getElementById('restartArea').style.display = "block";
         return;
     }
@@ -200,7 +200,6 @@ function drawMore() {
 
 function imDone() {
     document.getElementById('actionArea').style.display = "none";
-    document.getElementById('resultArea').innerHTML += `<div style="color:#ff69b4; font-weight:bold; margin-top:20px; text-align:center; font-size:18px;">💕 終於想通了？笨蛋學長快去吃啦！</div>`;
     document.getElementById('restartArea').style.display = "block";
 }
 
