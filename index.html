@@ -59,10 +59,9 @@
     <div id="resultArea" class="result-box" style="display:none;"></div>
     
     <div id="actionArea" style="display:none; text-align:center; margin-top:15px;">
-        <div style="font-weight:bold; color:#ff69b4;">🤔 決定好了沒啦，雜魚？</div>
         <div class="btn-row">
             <button class="btn-good" onclick="imDone()">1. 好了</button>
-            <button class="btn-rand" onclick="drawMore()">2. 隨便抽(3個)</button>
+            <button class="btn-rand" onclick="drawMore()">2. 隨便</button>
         </div>
     </div>
 
@@ -151,7 +150,7 @@ function initialSearch() {
     res.style.display = "block";
     
     if (filteredList.length === 0) {
-        res.innerHTML = "<b style='color:#ff69b4;'>😡 這麼挑！沒東西吃了啦，雜魚學長去吃全家！</b>";
+        res.innerHTML = "<b style='color:#ff69b4;'>😡 這麼挑！沒東西吃了啦，去吃全家！</b>";
         document.getElementById('actionArea').style.display = "none";
         document.getElementById('restartArea').style.display = "block";
         return;
@@ -181,7 +180,6 @@ function drawMore() {
     }
     
     filteredList.sort(() => Math.random() - 0.5);
-    // 這裡改成抽 3 個囉！雜魚學長看清楚！
     const picks = filteredList.splice(0, 3);
     
     if (picks.length === 0) {
