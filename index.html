@@ -16,7 +16,6 @@
         .result-box { margin-top: 20px; padding: 15px; background: #fffafa; border-radius: 10px; border: 1px solid #ffe4e1; max-height: 350px; overflow-y: auto; }
         .btn-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center;}
         
-        /* 更新按鈕樣式使其並排 */
         .btn-confirm { flex: 1; background: #ff1493; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
         .btn-rand { flex: 1; background: #ff69b4; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
         
@@ -89,7 +88,7 @@
     <div class="modal-content">
         <div id="modalRestaurantName" class="modal-name">店名佔位符</div>
         <div class="modal-btn-row">
-            <button class="btn-modal-re" onclick="modalRestart()">重新</button>
+            <button class="btn-modal-re" onclick="resetApp()">重新通靈</button>
             <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
         </div>
     </div>
@@ -216,17 +215,12 @@ function confirmSelection() {
         return;
     }
     const name = checked.getAttribute('data-name');
-    const googleLink = `https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(name)}`;
+    const googleLink = `http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(name)}`;
     
     document.getElementById('modalRestaurantName').textContent = name;
     document.getElementById('modalGoogleLink').href = googleLink;
     document.getElementById('confirmModal').style.display = 'flex';
     document.getElementById('actionArea').style.display = 'none';
-}
-
-function modalRestart() {
-    document.getElementById('confirmModal').style.display = 'none';
-    document.getElementById('actionArea').style.display = 'block';
 }
 
 function drawMore() {
