@@ -18,15 +18,31 @@
         .btn-confirm { flex: 1; background: #ff1493; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
         .btn-rand { flex: 1; background: #ff69b4; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
         .btn-reset { background: #ffb6c1; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .list-item { margin-bottom: 10px; border-bottom: 1px solid #ffe4e1; padding-bottom: 8px; display: flex; align-items: flex-start;}
-        .select-check { margin-top: 5px; margin-right: 12px; transform: scale(1.3); cursor: pointer;}
-        .list-item-content { flex: 1; }
+        
+        /* 增加整個區域的可點擊性 */
+        .list-item { 
+            margin-bottom: 10px; 
+            border-bottom: 1px solid #ffe4e1; 
+            padding: 8px; 
+            display: flex; 
+            align-items: flex-start; 
+            cursor: pointer; 
+            transition: background 0.2s;
+            border-radius: 8px;
+        }
+        .list-item:hover { background: #fff0f5; }
+        
+        .select-check { margin-top: 5px; margin-right: 12px; transform: scale(1.3); cursor: pointer; pointer-events: none; } /* 讓點擊事件穿透到父元素 */
+        .list-item-content { flex: 1; pointer-events: none; } /* 讓點擊事件穿透到父元素 */
+        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; width: 80%; max-width: 320px; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center;}
+        .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center;}
         .modal-name { font-size: 20px; font-weight: bold; color: #ff69b4; margin-bottom: 20px; border: 2px solid #ffe4e1; padding: 10px; border-radius: 8px; }
-        .modal-btn-row { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-        .btn-modal-re { flex: 1; background: #ffb6c1; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .modal-btn-grid { display: flex; flex-direction: column; gap: 10px; }
+        .modal-btn-row-top { display: flex; gap: 10px; }
+        .btn-modal-cancel { flex: 1; background: #ccc; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-modal-google { flex: 1; background: #34a853; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block;}
+        .btn-modal-restart { width: 100%; background: #ffb6c1; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -71,17 +87,21 @@
         <button class="btn-reset" onclick="resetApp()">🔄 全新通靈 (重置)</button>
     </div>
 </div>
+
 <div id="confirmModal" class="modal-overlay">
     <div class="modal-content">
         <div id="modalRestaurantName" class="modal-name">店名</div>
-        <div class="modal-btn-row">
-            <button class="btn-modal-re" onclick="resetApp()">重新通靈</button>
-            <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
+        <div class="modal-btn-grid">
+            <div class="modal-btn-row-top">
+                <button class="btn-modal-cancel" onclick="closeModal()">取消</button>
+                <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
+            </div>
+            <button class="btn-modal-restart" onclick="resetApp()">重新通靈</button>
         </div>
     </div>
 </div>
+
 <script>
-// 資料庫省略，請保留您原本的 data 陣列
 const data = [
     {name:"華陽豆漿", price:"100以下", time:"早", dist:5, type:"無"},
     {name:"街口飯糰", price:"100以下", time:"早", dist:10, type:"無"},
@@ -160,7 +180,7 @@ function initialSearch() {
     }
     let html = `<b>✨ 共找到 ${filteredList.length} 家：</b><br><br>`;
     html += filteredList.map((r, index) => `
-        <div class="list-item">
+        <div class="list-item" onclick="handleItemClick(this)">
             <input type="checkbox" class="select-check" data-name="${r.name}">
             <div class="list-item-content">
                 <b style="color:#ff69b4;">👉 ${r.name}</b><br>
@@ -172,22 +192,34 @@ function initialSearch() {
     document.getElementById('actionArea').style.display = "block";
 }
 
-document.getElementById('resultArea').addEventListener('click', function(e) {
-    if (e.target.classList.contains('select-check')) {
-        document.querySelectorAll('.select-check').forEach(check => { if (check !== e.target) check.checked = false; });
-    }
-});
+// 處理點選長條方框的邏輯
+function handleItemClick(element) {
+    const checkbox = element.querySelector('.select-check');
+    const isChecked = checkbox.checked;
+    
+    // 先取消所有的勾選
+    document.querySelectorAll('.select-check').forEach(check => {
+        check.checked = false;
+    });
+    
+    // 設定當前這一個的勾選狀態
+    checkbox.checked = !isChecked;
+}
 
 function confirmSelection() {
     const checked = document.querySelector('.select-check:checked');
-    if (!checked) { alert('請先勾選一家餐廳！'); return; }
+    if (!checked) { alert('請先點選一家餐廳！'); return; }
     const name = checked.getAttribute('data-name');
-    // 使用官方標準 URL API 格式，提升行動裝置跳轉成功率
     const googleLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name);
     document.getElementById('modalRestaurantName').textContent = name;
     document.getElementById('modalGoogleLink').href = googleLink;
     document.getElementById('confirmModal').style.display = 'flex';
     document.getElementById('actionArea').style.display = 'none';
+}
+
+function closeModal() {
+    document.getElementById('confirmModal').style.display = 'none';
+    document.getElementById('actionArea').style.display = 'block';
 }
 
 function drawMore() {
@@ -206,7 +238,11 @@ function drawMore() {
         return;
     }
     let html = `<div style="background:#fff0f5; padding:10px; margin-top:10px; border-radius:8px;"><b>🔮 第 ${count} 次抽籤：</b><br>`;
-    html += picks.map(r => `<div class="list-item"><input type="checkbox" class="select-check" data-name="${r.name}"><div class="list-item-content">➡️ ${r.name}</div></div>`).join('');
+    html += picks.map(r => `
+        <div class="list-item" onclick="handleItemClick(this)">
+            <input type="checkbox" class="select-check" data-name="${r.name}">
+            <div class="list-item-content">➡️ ${r.name}</div>
+        </div>`).join('');
     html += `</div>`;
     const res = document.getElementById('resultArea');
     res.innerHTML += html;
