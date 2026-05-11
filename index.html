@@ -14,12 +14,14 @@
         .btn-main { background: #ff69b4; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .btn-main:hover { background: #ff1493; }
         .result-box { margin-top: 20px; padding: 15px; background: #fffafa; border-radius: 10px; border: 1px solid #ffe4e1; max-height: 350px; overflow-y: auto; }
-        .btn-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center;}
-        .btn-confirm { flex: 1; background: #ff1493; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
-        .btn-rand { flex: 1; background: #ff69b4; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
-        .btn-reset { background: #ffb6c1; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
         
-        /* 增加整個區域的可點擊性 */
+        /* 按鈕佈局 */
+        .btn-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center;}
+        .btn-confirm { flex: 1; background: #ff1493; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 120px;}
+        .btn-rand { flex: 1; background: #ff69b4; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 120px;}
+        .btn-exclude { width: 100%; background: #666; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        .btn-restart-inline { width: 100%; background: #ffb6c1; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 5px; }
+        
         .list-item { 
             margin-bottom: 10px; 
             border-bottom: 1px solid #ffe4e1; 
@@ -31,10 +33,10 @@
             border-radius: 8px;
         }
         .list-item:hover { background: #fff0f5; }
+        .select-check { margin-top: 5px; margin-right: 12px; transform: scale(1.3); cursor: pointer; pointer-events: none; }
+        .list-item-content { flex: 1; pointer-events: none; }
         
-        .select-check { margin-top: 5px; margin-right: 12px; transform: scale(1.3); cursor: pointer; pointer-events: none; } /* 讓點擊事件穿透到父元素 */
-        .list-item-content { flex: 1; pointer-events: none; } /* 讓點擊事件穿透到父元素 */
-        
+        /* Modal 樣式 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center;}
         .modal-name { font-size: 20px; font-weight: bold; color: #ff69b4; margin-bottom: 20px; border: 2px solid #ffe4e1; padding: 10px; border-radius: 8px; }
@@ -42,7 +44,6 @@
         .modal-btn-row-top { display: flex; gap: 10px; }
         .btn-modal-cancel { flex: 1; background: #ccc; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .btn-modal-google { flex: 1; background: #34a853; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block;}
-        .btn-modal-restart { width: 100%; background: #ffb6c1; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -76,15 +77,19 @@
         <button class="btn-main" onclick="initialSearch()">🔍 搜尋全名單</button>
     </div>
     <div id="resultArea" class="result-box" style="display:none;"></div>
+    
     <div id="actionArea" style="display:none; text-align:center; margin-top:15px;">
-        <div style="font-weight:bold; color:#ff69b4;">🤔 決定好了嗎？</div>
+        <div id="actionHint" style="font-weight:bold; color:#ff69b4;">🤔 決定好了嗎？</div>
         <div class="btn-row">
-            <button class="btn-confirm" onclick="confirmSelection()">✅ 確認勾選</button>
-            <button class="btn-rand" onclick="drawMore()">🎲 隨便抽</button>
+            <button id="mainConfirmBtn" class="btn-confirm" onclick="confirmSelection()">✅ 確認勾選</button>
+            <button id="mainRandBtn" class="btn-rand" onclick="drawMore()">🎲 隨便抽</button>
+            <button id="excludeBtn" class="btn-exclude" onclick="toggleExcludeMode()">🚫 排除名單 (複選)</button>
+            <button class="btn-restart-inline" onclick="resetApp()">🔄 重新通靈</button>
         </div>
     </div>
+
     <div id="restartArea" style="display:none; text-align:center;">
-        <button class="btn-reset" onclick="resetApp()">🔄 全新通靈 (重置)</button>
+        <button class="btn-main" style="background:#ffb6c1" onclick="resetApp()">🔄 全新通靈 (重置)</button>
     </div>
 </div>
 
@@ -96,67 +101,68 @@
                 <button class="btn-modal-cancel" onclick="closeModal()">取消</button>
                 <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
             </div>
-            <button class="btn-modal-restart" onclick="resetApp()">重新通靈</button>
+            <button class="btn-main" style="margin-top:0; background:#ffb6c1" onclick="resetApp()">重新通靈</button>
         </div>
     </div>
 </div>
 
 <script>
 const data = [
-    {name:"華陽豆漿", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"街口飯糰", price:"100以下", time:"早", dist:10, type:"無"},
-    {name:"白鳥餐點店", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"長江早餐店", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"Q Burger", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"維亞歐式早餐", price:"100~200", time:"早", dist:5, type:"無"},
-    {name:"巴特手作晨食", price:"100~200", time:"早", dist:10, type:"無"},
-    {name:"阿寶 A-Bao", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"三豆二麥", price:"100以下", time:"早", dist:10, type:"無"},
-    {name:"餅霸天下", price:"100以下", time:"早", dist:15, type:"無"},
-    {name:"食鮮森鐵板燒", price:"100~200", time:"午晚", dist:10, type:"中式"},
-    {name:"蓋飯家族", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"飽米便當", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"阿章控肉飯", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"彰化美香牛哥", price:"100~200", time:"午晚", dist:5, type:"中式"},
-    {name:"聞香牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"大王牛肉麵", price:"100~200", time:"午", dist:15, type:"中式"},
-    {name:"鲁肉擔仔麵", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"異式義式麵食", price:"100~200", time:"午晚", dist:5, type:"西式"},
-    {name:"老夫子牛排", price:"100~200", time:"午晚", dist:5, type:"西式"},
-    {name:"帕司咖啡Pass", price:"100~200", time:"午晚", dist:5, type:"西式"},
-    {name:"牛太郎燒肉丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
-    {name:"千菊丸拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
-    {name:"原山拉麵", price:"100~200", time:"午晚", dist:5, type:"日式"},
-    {name:"九湯屋拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
-    {name:"拉麵小徑", price:"200以上", time:"晚", dist:10, type:"日式"},
-    {name:"麵屋三金", price:"100以下", time:"午晚", dist:5, type:"日式"},
-    {name:"狐狸工頭", price:"200以上", time:"午晚", dist:5, type:"日式"},
-    {name:"丸盛拉麵屋", price:"100~200", time:"午晚", dist:10, type:"日式"},
-    {name:"福田家咖哩", price:"100~200", time:"午晚", dist:15, type:"日式"},
-    {name:"雁歸雞湯拉麵", price:"200以上", time:"午晚", dist:10, type:"日式"},
-    {name:"BVKcurry", price:"200以上", time:"午晚", dist:10, type:"日式"},
-    {name:"雲南小吃", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"大思鄉臭臭鍋", price:"100~200", time:"午晚", dist:5, type:"中式"},
-    {name:"四海豆漿", price:"100~200", time:"午晚", dist:10, type:"中式"},
-    {name:"寶記港式飲茶", price:"100~200", time:"晚", dist:15, type:"中式"},
-    {name:"億品鍋", price:"200以上", time:"午晚", dist:10, type:"中式"},
-    {name:"八方雲集", price:"100以下", time:"午晚", dist:15, type:"中式"},
-    {name:"紅嬌炸粿", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"火鍋世家", price:"200以上", time:"午晚", dist:5, type:"中式"},
-    {name:"微笑冰果室", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"蔡媽媽蔥油餅", price:"100以下", time:"點", dist:5, type:"無"},
-    {name:"珍北平餡餅", price:"100以下", time:"點", dist:5, type:"無"},
-    {name:"炸職人", price:"100~200", time:"點", dist:5, type:"無"},
-    {name:"龍哥雞排", price:"100~200", time:"點", dist:10, type:"無"},
-    {name:"南郭鹹酥雞", price:"100~200", time:"點", dist:5, type:"無"},
-    {name:"中山豆漿", price:"100以下", time:"點", dist:10, type:"無"},
-    {name:"塩彡", price:"100~200", time:"點", dist:10, type:"無"},
-    {name:"鼎豆芋圓", price:"100以下", time:"點", dist:15, type:"無"},
-    {name:"精誠夜市", price:"100~200", time:"點", dist:15, type:"無"}
+    {id:1, name:"華陽豆漿", price:"100以下", time:"早", dist:5, type:"無"},
+    {id:2, name:"街口飯糰", price:"100以下", time:"早", dist:10, type:"無"},
+    {id:3, name:"白鳥餐點店", price:"100以下", time:"早", dist:5, type:"無"},
+    {id:4, name:"長江早餐店", price:"100以下", time:"早", dist:5, type:"無"},
+    {id:5, name:"Q Burger", price:"100以下", time:"早", dist:5, type:"無"},
+    {id:6, name:"維亞歐式早餐", price:"100~200", time:"早", dist:5, type:"無"},
+    {id:7, name:"巴特手作晨食", price:"100~200", time:"早", dist:10, type:"無"},
+    {id:8, name:"阿寶 A-Bao", price:"100以下", time:"早", dist:5, type:"無"},
+    {id:9, name:"三豆二麥", price:"100以下", time:"早", dist:10, type:"無"},
+    {id:10, name:"餅霸天下", price:"100以下", time:"早", dist:15, type:"無"},
+    {id:11, name:"食鮮森鐵板燒", price:"100~200", time:"午晚", dist:10, type:"中式"},
+    {id:12, name:"蓋飯家族", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {id:13, name:"飽米便當", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {id:14, name:"阿章控肉飯", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {id:15, name:"彰化美香牛哥", price:"100~200", time:"午晚", dist:5, type:"中式"},
+    {id:16, name:"聞香牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {id:17, name:"大王牛肉麵", price:"100~200", time:"午", dist:15, type:"中式"},
+    {id:18, name:"鲁肉擔仔麵", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {id:19, name:"異式義式麵食", price:"100~200", time:"午晚", dist:5, type:"西式"},
+    {id:20, name:"老夫子牛排", price:"100~200", time:"午晚", dist:5, type:"西式"},
+    {id:21, name:"帕司咖啡Pass", price:"100~200", time:"午晚", dist:5, type:"西式"},
+    {id:22, name:"牛太郎燒肉丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
+    {id:23, name:"千菊丸拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {id:24, name:"原山拉麵", price:"100~200", time:"午晚", dist:5, type:"日式"},
+    {id:25, name:"九湯屋拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {id:26, name:"拉麵小徑", price:"200以上", time:"晚", dist:10, type:"日式"},
+    {id:27, name:"麵屋三金", price:"100以下", time:"午晚", dist:5, type:"日式"},
+    {id:28, name:"狐狸工頭", price:"200以上", time:"午晚", dist:5, type:"日式"},
+    {id:29, name:"丸盛拉麵屋", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {id:30, name:"福田家咖哩", price:"100~200", time:"午晚", dist:15, type:"日式"},
+    {id:31, name:"雁歸雞湯拉麵", price:"200以上", time:"午晚", dist:10, type:"日式"},
+    {id:32, name:"BVKcurry", price:"200以上", time:"午晚", dist:10, type:"日式"},
+    {id:33, name:"雲南小吃", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {id:34, name:"大思鄉臭臭鍋", price:"100~200", time:"午晚", dist:5, type:"中式"},
+    {id:35, name:"四海豆漿", price:"100~200", time:"午晚", dist:10, type:"中式"},
+    {id:36, name:"寶記港式飲茶", price:"100~200", time:"晚", dist:15, type:"中式"},
+    {id:37, name:"億品鍋", price:"200以上", time:"午晚", dist:10, type:"中式"},
+    {id:38, name:"八方雲集", price:"100以下", time:"午晚", dist:15, type:"中式"},
+    {id:39, name:"紅嬌炸粿", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {id:40, name:"火鍋世家", price:"200以上", time:"午晚", dist:5, type:"中式"},
+    {id:41, name:"微笑冰果室", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {id:42, name:"蔡媽媽蔥油餅", price:"100以下", time:"點", dist:5, type:"無"},
+    {id:43, name:"珍北平餡餅", price:"100以下", time:"點", dist:5, type:"無"},
+    {id:44, name:"炸職人", price:"100~200", time:"點", dist:5, type:"無"},
+    {id:45, name:"龍哥雞排", price:"100~200", time:"點", dist:10, type:"無"},
+    {id:46, name:"南郭鹹酥雞", price:"100~200", time:"點", dist:5, type:"無"},
+    {id:47, name:"中山豆漿", price:"100以下", time:"點", dist:10, type:"無"},
+    {id:48, name:"塩彡", price:"100~200", time:"點", dist:10, type:"無"},
+    {id:49, name:"鼎豆芋圓", price:"100以下", time:"點", dist:15, type:"無"},
+    {id:50, name:"精誠夜市", price:"100~200", time:"點", dist:15, type:"無"}
 ];
 
 let filteredList = [];
-let count = 0;
+let drawCount = 0;
+let isExcludeMode = false;
 
 function toggleTypeSelect() {
     const t = document.getElementById('timeSelect').value;
@@ -168,79 +174,124 @@ function initialSearch() {
     const type = document.getElementById('typeSelect').value;
     const p = document.getElementById('priceSelect').value;
     const d = parseInt(document.getElementById('distSelect').value);
-    filteredList = data.filter(r => r.time.includes(t) && (t !== "午" && t !== "晚" || type === "都可" || r.type === type) && (p === "不限" || r.price === p) && r.dist <= d);
-    count = 0;
+    
+    // 初始化清單，賦予唯一 ID 以便排除
+    filteredList = data.filter(r => 
+        r.time.includes(t) && 
+        (t !== "午" && t !== "晚" || type === "都可" || r.type === type) && 
+        (p === "不限" || r.price === p) && 
+        r.dist <= d
+    ).map((item, idx) => ({...item, currentId: idx}));
+
+    drawCount = 0;
+    renderList();
+    document.getElementById('setupArea').style.display = "none";
+    document.getElementById('actionArea').style.display = "block";
+}
+
+function renderList() {
     const res = document.getElementById('resultArea');
     res.style.display = "block";
     if (filteredList.length === 0) {
-        res.innerHTML = "<b>😭 查無符合條件的餐廳！</b>";
+        res.innerHTML = "<b>😭 列表中已無店家！</b>";
         document.getElementById('actionArea').style.display = "none";
         document.getElementById('restartArea').style.display = "block";
         return;
     }
-    let html = `<b>✨ 共找到 ${filteredList.length} 家：</b><br><br>`;
-    html += filteredList.map((r, index) => `
+    
+    let html = `<b>✨ 目前名單 (${filteredList.length} 家)：</b><br><br>`;
+    html += filteredList.map(r => `
         <div class="list-item" onclick="handleItemClick(this)">
-            <input type="checkbox" class="select-check" data-name="${r.name}">
+            <input type="checkbox" class="select-check" data-id="${r.currentId}" data-name="${r.name}">
             <div class="list-item-content">
                 <b style="color:#ff69b4;">👉 ${r.name}</b><br>
                 <span style="color:#888; font-size:12px;">${r.type} | ${r.price} | ${r.dist}分</span>
             </div>
         </div>`).join('');
     res.innerHTML = html;
-    document.getElementById('setupArea').style.display = "none";
-    document.getElementById('actionArea').style.display = "block";
 }
 
-// 處理點選長條方框的邏輯
 function handleItemClick(element) {
     const checkbox = element.querySelector('.select-check');
-    const isChecked = checkbox.checked;
-    
-    // 先取消所有的勾選
-    document.querySelectorAll('.select-check').forEach(check => {
-        check.checked = false;
-    });
-    
-    // 設定當前這一個的勾選狀態
-    checkbox.checked = !isChecked;
+    if (!isExcludeMode) {
+        // 單選模式
+        const wasChecked = checkbox.checked;
+        document.querySelectorAll('.select-check').forEach(c => c.checked = false);
+        checkbox.checked = !wasChecked;
+    } else {
+        // 排除模式 (複選)
+        checkbox.checked = !checkbox.checked;
+    }
+}
+
+function toggleExcludeMode() {
+    isExcludeMode = !isExcludeMode;
+    const btn = document.getElementById('excludeBtn');
+    const hint = document.getElementById('actionHint');
+    const confirmBtn = document.getElementById('mainConfirmBtn');
+    const randBtn = document.getElementById('mainRandBtn');
+
+    if (isExcludeMode) {
+        btn.innerText = "❌ 確認剔除所選";
+        btn.style.background = "#ff4500";
+        hint.innerText = "🚫 正在排除模式 (可複選店家)";
+        confirmBtn.style.display = "none";
+        randBtn.style.display = "none";
+    } else {
+        // 執行剔除邏輯
+        const checkedBoxes = document.querySelectorAll('.select-check:checked');
+        if (checkedBoxes.length > 0) {
+            const idsToRemove = Array.from(checkedBoxes).map(cb => parseInt(cb.getAttribute('data-id')));
+            filteredList = filteredList.filter(item => !idsToRemove.includes(item.currentId));
+            renderList();
+        }
+        
+        // 恢復正常模式
+        btn.innerText = "🚫 排除名單 (複選)";
+        btn.style.background = "#666";
+        hint.innerText = "🤔 決定好了嗎？";
+        confirmBtn.style.display = "block";
+        randBtn.style.display = "block";
+    }
 }
 
 function confirmSelection() {
     const checked = document.querySelector('.select-check:checked');
     if (!checked) { alert('請先點選一家餐廳！'); return; }
     const name = checked.getAttribute('data-name');
-    const googleLink = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(name);
+    const googleLink = "https://www.google.com/maps/search/" + encodeURIComponent(name);
     document.getElementById('modalRestaurantName').textContent = name;
     document.getElementById('modalGoogleLink').href = googleLink;
     document.getElementById('confirmModal').style.display = 'flex';
-    document.getElementById('actionArea').style.display = 'none';
 }
 
 function closeModal() {
     document.getElementById('confirmModal').style.display = 'none';
-    document.getElementById('actionArea').style.display = 'block';
 }
 
 function drawMore() {
-    count++;
-    if (count === 4) {
+    drawCount++;
+    if (drawCount === 4) {
         document.getElementById('actionArea').style.display = "none";
-        document.getElementById('resultArea').innerHTML += `<div style="color:red; margin-top:15px;">沒有選項了！</div>`;
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; margin-top:15px; text-align:center;">抽籤次數已達上限！</div>`;
         document.getElementById('restartArea').style.display = "block";
         return;
     }
-    filteredList.sort(() => Math.random() - 0.5);
-    const picks = filteredList.splice(0, 3);
+    
+    // 隨機洗牌並選出 3 家
+    let tempArray = [...filteredList].sort(() => Math.random() - 0.5);
+    const picks = tempArray.slice(0, 3);
+    
     if (picks.length === 0) {
         document.getElementById('actionArea').style.display = "none";
         document.getElementById('restartArea').style.display = "block";
         return;
     }
-    let html = `<div style="background:#fff0f5; padding:10px; margin-top:10px; border-radius:8px;"><b>🔮 第 ${count} 次抽籤：</b><br>`;
+
+    let html = `<div style="background:#fff0f5; padding:10px; margin-top:10px; border-radius:8px; border:1px dashed #ffb6c1"><b>🔮 第 ${drawCount} 次抽籤：</b><br>`;
     html += picks.map(r => `
         <div class="list-item" onclick="handleItemClick(this)">
-            <input type="checkbox" class="select-check" data-name="${r.name}">
+            <input type="checkbox" class="select-check" data-id="${r.currentId}" data-name="${r.name}">
             <div class="list-item-content">➡️ ${r.name}</div>
         </div>`).join('');
     html += `</div>`;
@@ -256,7 +307,16 @@ function resetApp() {
     document.getElementById('resultArea').innerHTML = "";
     document.getElementById('actionArea').style.display = "none";
     document.getElementById('restartArea').style.display = "none";
-    count = 0;
+    
+    // 確保回到正常單選模式
+    isExcludeMode = false;
+    const btn = document.getElementById('excludeBtn');
+    btn.innerText = "🚫 排除名單 (複選)";
+    btn.style.background = "#666";
+    document.getElementById('mainConfirmBtn').style.display = "block";
+    document.getElementById('mainRandBtn').style.display = "block";
+    
+    drawCount = 0;
     filteredList = [];
 }
 </script>
