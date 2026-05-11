@@ -15,42 +15,39 @@
         select, button { width: 100%; padding: 12px; border-radius: 12px; border: 2px solid #ffe4e1; font-size: 16px; margin-top: 5px; outline: none; transition: 0.2s; }
         
         button:active { transform: scale(0.96); }
-        .btn-main { background: var(--main-pink); color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 10px rgba(255,105,180,0.3); }
+        .btn-main { background: var(--main-pink); color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
         .result-box { margin-top: 20px; padding: 15px; background: #fffafa; border-radius: 15px; border: 1px solid #ffe4e1; max-height: 380px; overflow-y: auto; }
         
-        /* 按鈕區 */
         .btn-row { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
         .btn-confirm { flex: 1; background: var(--dark-pink); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-rand { flex: 1; background: var(--main-pink); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-exclude { width: 100%; background: #777; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
         .btn-restart { width: 100%; background: #ffb6c1; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
 
-        /* 列表樣式 */
         .list-item { margin-bottom: 10px; border-bottom: 1px solid #ffe4e1; padding: 10px; display: flex; align-items: flex-start; cursor: pointer; border-radius: 10px; transition: 0.2s; }
         .list-item:hover { background: var(--light-pink); }
         .select-check { margin-top: 4px; margin-right: 12px; transform: scale(1.3); pointer-events: none; }
         .list-item-content { flex: 1; pointer-events: none; }
 
-        /* 動畫過渡 */
         .rolling-text { text-align: center; padding: 40px; font-size: 22px; color: var(--dark-pink); font-weight: bold; animation: pulse 0.1s infinite alternate; }
         @keyframes pulse { from { opacity: 0.7; } to { opacity: 1; } }
 
-        /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; }
         .modal-name { font-size: 20px; font-weight: bold; color: var(--main-pink); margin-bottom: 20px; border: 2px solid var(--light-pink); padding: 15px; border-radius: 12px; }
-        .modal-btn-grid { display: flex; flex-direction: column; gap: 10px; }
-        .modal-top-row { display: flex; gap: 10px; }
-        .btn-modal-cancel { flex: 1; background: #eee; color: #666; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-modal-google { flex: 1; background: #34a853; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .btn-modal-cancel { background: #eee; color: #666; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-modal-google { background: #34a853; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        
+        /* 憤怒 Modal 專用樣式 */
+        .angry-text { font-size: 22px; color: #e74c3c; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="app-card">
     <h2>全家逃離指南:通靈點餐機</h2>
-    <div class="sub">校園美食隨機推薦系統 V6.5</div>
+    <div class="sub">校園美食隨機推薦系統 V6.8</div>
     
     <div id="setupArea">
         <label>🕒 時段</label>
@@ -90,13 +87,18 @@
 <div id="confirmModal" class="modal-overlay">
     <div class="modal-content">
         <div id="modalRestaurantName" class="modal-name">店名</div>
-        <div class="modal-btn-grid">
-            <div class="modal-top-row">
-                <button class="btn-modal-cancel" onclick="closeModal()">取消</button>
-                <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
-            </div>
-            <button class="btn-restart" style="margin:0" onclick="resetApp()">🔄 重新開始</button>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button class="btn-modal-cancel" style="flex:1" onclick="closeModal()">取消</button>
+            <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google" style="flex:1">Google Map</a>
         </div>
+        <button class="btn-restart" style="margin:0" onclick="resetApp()">🔄 重新開始</button>
+    </div>
+</div>
+
+<div id="angryModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="angry-text">😡<br>這麼難搞就吃全家啦！！</div>
+        <button class="btn-main" style="margin:0" onclick="resetApp()">🔄 重新通靈 (重置)</button>
     </div>
 </div>
 
@@ -116,6 +118,7 @@ const data = [
 
 let filteredList = [];
 let isExcludeMode = false;
+let drawCount = 0; // 追蹤抽籤次數
 
 function toggleTypeSelect() {
     const t = document.getElementById('timeSelect').value;
@@ -130,6 +133,7 @@ function initialSearch() {
     
     filteredList = data.filter(r => r.time.includes(t) && (t !== "午" && t !== "晚" || type === "都可" || r.type === type) && (p === "不限" || r.price === p) && r.dist <= d);
     
+    drawCount = 0;
     renderList();
     document.getElementById('setupArea').style.display = "none";
     document.getElementById('actionArea').style.display = "block";
@@ -160,15 +164,20 @@ function handleItemClick(el) {
     }
 }
 
-// 🎰 這是抽籤動畫核心
 function drawWithAnimation() {
     if (filteredList.length === 0) return;
+
+    // 如果已經抽了 3 次，再次點擊就發火
+    if (drawCount >= 3) {
+        document.getElementById('angryModal').style.display = 'flex';
+        return;
+    }
+
     const res = document.getElementById('resultArea');
     const originalContent = res.innerHTML;
     let timer = 0;
-    const duration = 1500; // 動畫跑 1.5 秒
+    const duration = 1200;
 
-    // 隱藏按鈕區，防止重複點擊
     document.getElementById('actionArea').style.opacity = "0.5";
     document.getElementById('randBtn').disabled = true;
 
@@ -179,26 +188,26 @@ function drawWithAnimation() {
         if (timer >= duration) {
             clearInterval(interval);
             res.innerHTML = originalContent;
-            finalizeDraw(); // 動畫完後才出結果
+            finalizeDraw();
         }
     }, 100);
 }
 
 function finalizeDraw() {
+    drawCount++; // 增加次數
     document.getElementById('actionArea').style.opacity = "1";
     document.getElementById('randBtn').disabled = false;
     
-    // 隨便抽 3 個並放到結果區最下面
-    const pool = [...filteredList].sort(() => Math.random() - 0.5);
-    const picks = pool.slice(0, 3);
+    // 一次只抽 1 個
+    const randomIndex = Math.floor(Math.random() * filteredList.length);
+    const pick = filteredList[randomIndex];
     
     const res = document.getElementById('resultArea');
-    const drawHtml = `<div style="background:var(--light-pink); padding:10px; margin-top:10px; border-radius:12px; border:2px dashed var(--main-pink);"><b>🔮 抽籤結果：</b><br>` + 
-        picks.map(r => `
-            <div class="list-item" onclick="handleItemClick(this)">
-                <input type="checkbox" class="select-check" data-name="${r.name}">
-                <div class="list-item-content">➡️ ${r.name}</div>
-            </div>`).join('') + `</div>`;
+    const drawHtml = `<div style="background:var(--light-pink); padding:10px; margin-top:10px; border-radius:12px; border:2px dashed var(--main-pink);"><b>🔮 第 ${drawCount} 次抽籤結果：</b><br>` + 
+        `<div class="list-item" onclick="handleItemClick(this)">
+            <input type="checkbox" class="select-check" data-name="${pick.name}">
+            <div class="list-item-content">➡️ ${pick.name}</div>
+        </div></div>`;
     
     res.innerHTML += drawHtml;
     res.scrollTop = res.scrollHeight;
@@ -212,7 +221,7 @@ function toggleExcludeMode() {
     if (isExcludeMode) {
         btn.innerText = "❌ 確認剔除所選";
         btn.style.background = "#e74c3c";
-        hint.innerText = "🚫 排除模式：勾選不想吃的，再按一次剔除。";
+        hint.innerText = "🚫 排除模式：勾選不想吃的項目。";
         document.getElementById('confirmBtn').style.display = "none";
         document.getElementById('randBtn').style.display = "none";
     } else {
@@ -242,12 +251,14 @@ function closeModal() { document.getElementById('confirmModal').style.display = 
 
 function resetApp() {
     document.getElementById('confirmModal').style.display = 'none';
+    document.getElementById('angryModal').style.display = 'none';
     document.getElementById('setupArea').style.display = "block";
     document.getElementById('resultArea').style.display = "none";
     document.getElementById('resultArea').innerHTML = "";
     document.getElementById('actionArea').style.display = "none";
     filteredList = [];
     isExcludeMode = false;
+    drawCount = 0;
 }
 </script>
 </body>
