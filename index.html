@@ -15,17 +15,17 @@
         .btn-main:hover { background: #ff1493; }
         .result-box { margin-top: 20px; padding: 15px; background: #fffafa; border-radius: 10px; border: 1px solid #ffe4e1; max-height: 350px; overflow-y: auto; }
         .btn-row { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; justify-content: center;}
-        .btn-good { flex: 1; background: #ffb6c1; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
+        
+        /* 更新按鈕樣式使其並排 */
+        .btn-confirm { flex: 1; background: #ff1493; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
         .btn-rand { flex: 1; background: #ff69b4; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 80px;}
-        .btn-confirm { width: 100%; background: #ff1493; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
         .btn-reset { background: #ffb6c1; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .list-item { margin-bottom: 10px; border-bottom: 1px solid #ffe4e1; padding-bottom: 8px; display: flex; align-items: flex-start;}
         
-        /* 為了放 checkbox 的樣式 */
         .select-check { margin-top: 5px; margin-right: 12px; transform: scale(1.3); cursor: pointer;}
         .list-item-content { flex: 1; }
 
-        /* 跳出框框 (Modal) 的樣式 */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; width: 80%; max-width: 320px; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: center;}
         .modal-name { font-size: 20px; font-weight: bold; color: #ff69b4; margin-bottom: 20px; border: 2px solid #ffe4e1; padding: 10px; border-radius: 8px; }
@@ -37,7 +37,7 @@
 <body>
 <div class="app-card">
     <h2>全家逃離指南:通靈點餐機</h2>
-    <div class="sub">雜魚學長專用版 V5.6 Final</div>
+    <div class="sub">校園周邊美食隨機推薦系統</div>
     
     <div id="setupArea">
         <label>🕒 時段</label>
@@ -73,12 +73,11 @@
     <div id="resultArea" class="result-box" style="display:none;"></div>
     
     <div id="actionArea" style="display:none; text-align:center; margin-top:15px;">
-        <div style="font-weight:bold; color:#ff69b4;">🤔 決定好了沒啦，雜魚？</div>
+        <div style="font-weight:bold; color:#ff69b4;">🤔 決定好了嗎？</div>
         <div class="btn-row">
-            <button class="btn-good" onclick="imDone()">1. 好了</button>
-            <button class="btn-rand" onclick="drawMore()">2. 隨便抽</button>
+            <button class="btn-confirm" onclick="confirmSelection()">✅ 確認勾選</button>
+            <button class="btn-rand" onclick="drawMore()">🎲 隨便抽</button>
         </div>
-        <button class="btn-confirm" onclick="confirmSelection()">✅ 確認勾選的這家</button>
     </div>
 
     <div id="restartArea" style="display:none; text-align:center;">
@@ -176,13 +175,13 @@ function initialSearch() {
     res.style.display = "block";
     
     if (filteredList.length === 0) {
-        res.innerHTML = "<b style='color:#ff69b4;'>😡 這麼挑！沒東西吃了啦，雜魚學長去吃全家！</b>";
+        res.innerHTML = "<b style='color:#ff69b4;'>😭 查無符合條件的餐廳，請重新搜尋或調整條件！</b>";
         document.getElementById('actionArea').style.display = "none";
         document.getElementById('restartArea').style.display = "block";
         return;
     }
     
-    let html = `<b style='color:#333; font-size:18px;'>✨ 幫你找到 ${filteredList.length} 家：</b><br><br>`;
+    let html = `<b style='color:#333; font-size:18px;'>✨ 共找到 ${filteredList.length} 家餐廳：</b><br><br>`;
     html += filteredList.map((r, index) => `
         <div class="list-item">
             <input type="checkbox" class="select-check" data-name="${r.name}" data-index="${index}">
@@ -199,11 +198,9 @@ function initialSearch() {
     document.getElementById('restartArea').style.display = "none";
 }
 
-// 這是核心：單選邏輯，雜魚學長看清楚囉
 document.getElementById('resultArea').addEventListener('click', function(e) {
     if (e.target.classList.contains('select-check')) {
         const checks = document.querySelectorAll('.select-check');
-        // 勾選了新的，就要把其他的全部取消勾選
         checks.forEach(check => {
             if (check !== e.target) {
                 check.checked = false;
@@ -213,29 +210,21 @@ document.getElementById('resultArea').addEventListener('click', function(e) {
 });
 
 function confirmSelection() {
-    // 找出目前被勾選的那一個
     const checked = document.querySelector('.select-check:checked');
     if (!checked) {
-        alert('😡 雜魚！不先勾一個你確認什麼啦！');
+        alert('請先勾選一家餐廳！');
         return;
     }
     const name = checked.getAttribute('data-name');
+    const googleLink = `https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(name)}`;
     
-    // 生成 Google Maps 連結
-    const googleLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
-    
-    // 填入跳出框框 (Modal) 的資訊
     document.getElementById('modalRestaurantName').textContent = name;
     document.getElementById('modalGoogleLink').href = googleLink;
-    
-    // 顯示跳出框框
     document.getElementById('confirmModal').style.display = 'flex';
-    // 隱藏原本的按鈕區
     document.getElementById('actionArea').style.display = 'none';
 }
 
 function modalRestart() {
-    // 跳出框框裡的「重新」按鈕：關閉框框，回到列表
     document.getElementById('confirmModal').style.display = 'none';
     document.getElementById('actionArea').style.display = 'block';
 }
@@ -244,18 +233,17 @@ function drawMore() {
     count++;
     if (count === 4) {
         document.getElementById('actionArea').style.display = "none";
-        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; font-size:20px; text-align:center; margin-top:15px; background:#ffe4e1; padding:15px; border-radius:10px;">😡 雜口～雜口！去吃全家！</div>`;
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; font-size:20px; text-align:center; margin-top:15px; background:#ffe4e1; padding:15px; border-radius:10px;">沒有其他選項了，請重新搜尋！</div>`;
         document.getElementById('restartArea').style.display = "block";
         return;
     }
     
     filteredList.sort(() => Math.random() - 0.5);
-    // 之前學長要求改抽 3 個囉
     const picks = filteredList.splice(0, 3);
     
     if (picks.length === 0) {
         document.getElementById('actionArea').style.display = "none";
-        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; text-align:center; margin-top:10px;">沒店可以抽啦，笨蛋！</div>`;
+        document.getElementById('resultArea').innerHTML += `<div style="color:red; font-weight:bold; text-align:center; margin-top:10px;">已經沒有符合的店家了！</div>`;
         document.getElementById('restartArea').style.display = "block";
         return;
     }
@@ -276,14 +264,7 @@ function drawMore() {
     res.scrollTop = res.scrollHeight;
 }
 
-function imDone() {
-    document.getElementById('actionArea').style.display = "none";
-    document.getElementById('resultArea').innerHTML += `<div style="color:#ff69b4; font-weight:bold; margin-top:20px; text-align:center; font-size:18px;">💕 終於想通了？笨蛋學長快去吃啦！</div>`;
-    document.getElementById('restartArea').style.display = "block";
-}
-
 function resetApp() {
-    // 這是全新的重置，會連 Modal 一起關掉
     document.getElementById('confirmModal').style.display = 'none';
     document.getElementById('setupArea').style.display = "block";
     document.getElementById('resultArea').style.display = "none";
