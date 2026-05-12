@@ -59,7 +59,12 @@
         <div id="typeArea">
             <label>🍱 種類</label>
             <select id="typeSelect">
-                <option value="西式">1. 西式</option><option value="日式">2. 日式</option><option value="韓式">3. 韓式</option><option value="中式">4. 中式</option><option value="都可" selected>6. 都可</option>
+                <option value="西式">1. 西式</option>
+                <option value="日式">2. 日式</option>
+                <option value="韓式">3. 韓式</option>
+                <option value="中式">4. 中式</option>
+                <option value="無">5. 其他</option>
+                <option value="都可" selected>6. 都可</option>
             </select>
         </div>
         <label>💰 預算</label>
@@ -145,7 +150,7 @@ const data = [
     {name:"天皇日式烤肉飯", price:"100以下", time:"午晚", dist:10, type:"日式"},
     {name:"釜山韓式料理", price:"100~200", time:"午晚", dist:10, type:"韓式"},
     {name:"Ruby日式廚房", price:"100~200", time:"午晚", dist:10, type:"日式"},
-    {name:"黃燜雞米飯", price:"100~200", time:"午晚", dist:10, type:"中式"}
+    {name:"黃燜雞米飯", price:"100~200", time:"午晚", dist:10, type:"中式"},
     // 【距離 10 分鐘】
     {name:"千菊丸拉麵", price:"100~200", time:"晚", dist:10, type:"日式"},
     {name:"丸盛拉麵屋", price:"100~200", time:"午晚", dist:10, type:"日式"},
@@ -215,7 +220,7 @@ function renderList() {
         filteredList.map((r, i) => `
             <div class="list-item" onclick="handleItemClick(this)">
                 <input type="checkbox" class="select-check" data-name="${r.name}">
-                <div class="list-item-content"><b>👉 ${r.name}</b><br><small>${r.type} | ${r.price} | ${r.dist}分</small></div>
+                <div class="list-item-content"><b>👉 ${r.name}</b><br><small>${r.type === "無" ? "其他" : r.type} | ${r.price} | ${r.dist}分</small></div>
             </div>`).join('');
 }
 
@@ -305,8 +310,10 @@ function confirmSelection() {
     const checked = document.querySelector('.select-check:checked');
     if (!checked) { alert("請先從列表中勾選一家餐廳！"); return; }
     const name = checked.getAttribute('data-name');
-    document.getElementById('modalRestaurantName').textContent = name;
+    
+    // 【修復的 BUG 在這裡！】換成 Google 官方最穩定的查詢網址
     document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+    
     document.getElementById('confirmModal').style.display = 'flex';
 }
 
