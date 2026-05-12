@@ -19,11 +19,11 @@
         
         .result-box { margin-top: 20px; padding: 15px; background: #fffafa; border-radius: 15px; border: 1px solid #ffe4e1; max-height: 380px; overflow-y: auto; }
         
-        .btn-row { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; }
-        .btn-confirm { flex: 1; background: var(--dark-pink); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-rand { flex: 1; background: var(--main-pink); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-exclude { width: 100%; background: #777; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-restart { width: 100%; background: #ffb6c1; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .btn-row { display: flex; gap: 8px; margin-top: 15px; flex-wrap: wrap; justify-content: center; }
+        .btn-confirm { flex: 1; background: var(--dark-pink); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; min-width: 120px; }
+        .btn-rand { flex: 1; background: var(--main-pink); color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; min-width: 120px; }
+        .btn-restart-inline { width: 100%; background: #ffb6c1; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .btn-exclude { width: 100%; background: #777; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
 
         .list-item { margin-bottom: 10px; border-bottom: 1px solid #ffe4e1; padding: 10px; display: flex; align-items: flex-start; cursor: pointer; border-radius: 10px; transition: 0.2s; }
         .list-item:hover { background: var(--light-pink); }
@@ -36,10 +36,12 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; }
         .modal-name { font-size: 20px; font-weight: bold; color: var(--main-pink); margin-bottom: 20px; border: 2px solid var(--light-pink); padding: 15px; border-radius: 12px; }
-        .btn-modal-cancel { background: #eee; color: #666; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-modal-google { background: #34a853; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         
-        /* 憤怒 Modal 專用樣式 */
+        .modal-btn-grid { display: flex; flex-direction: column; gap: 10px; }
+        .modal-btn-row-top { display: flex; gap: 10px; }
+        .btn-modal-cancel { flex: 1; background: #ccc; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-modal-google { flex: 1; background: #34a853; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        
         .angry-text { font-size: 22px; color: #e74c3c; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
     </style>
 </head>
@@ -47,7 +49,7 @@
 
 <div class="app-card">
     <h2>全家逃離指南:通靈點餐機</h2>
-    <div class="sub">校園美食隨機推薦系統 V6.8</div>
+    <div class="sub">校園周邊美食隨機推薦系統</div>
     
     <div id="setupArea">
         <label>🕒 時段</label>
@@ -57,16 +59,16 @@
         <div id="typeArea">
             <label>🍱 種類</label>
             <select id="typeSelect">
-                <option value="西式">西式</option><option value="日式">日式</option><option value="韓式">韓式</option><option value="中式">中式</option><option value="其他">其他</option><option value="都可" selected>都可</option>
+                <option value="西式">1. 西式</option><option value="日式">2. 日式</option><option value="韓式">3. 韓式</option><option value="中式">4. 中式</option><option value="其他">5. 其他</option><option value="都可" selected>6. 都可</option>
             </select>
         </div>
         <label>💰 預算</label>
         <select id="priceSelect">
             <option value="100以下">100以下</option><option value="100~200" selected>100~200</option><option value="200以上">200以上</option><option value="不限">不限</option>
         </select>
-        <label>🛵 距離 (騎車)</label>
+        <label>🛵 騎車時間</label>
         <select id="distSelect">
-            <option value="5">5分內</option><option value="10">10分內</option><option value="15">15分內</option><option value="999" selected>不限距離</option>
+            <option value="5">5分鐘內</option><option value="10">10分鐘內</option><option value="15">15分鐘內</option><option value="999" selected>不限距離</option>
         </select>
         <button class="btn-main" onclick="initialSearch()">🔍 啟動通靈搜尋</button>
     </div>
@@ -79,7 +81,7 @@
             <button id="confirmBtn" class="btn-confirm" onclick="confirmSelection()">✅ 確認勾選</button>
             <button id="randBtn" class="btn-rand" onclick="drawWithAnimation()">🎲 隨便抽</button>
             <button id="excludeBtn" class="btn-exclude" onclick="toggleExcludeMode()">🚫 排除名單模式</button>
-            <button class="btn-restart" onclick="resetApp()">🔄 重新通靈</button>
+            <button class="btn-restart-inline" onclick="resetApp()">🔄 重新通靈</button>
         </div>
     </div>
 </div>
@@ -87,11 +89,13 @@
 <div id="confirmModal" class="modal-overlay">
     <div class="modal-content">
         <div id="modalRestaurantName" class="modal-name">店名</div>
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button class="btn-modal-cancel" style="flex:1" onclick="closeModal()">取消</button>
-            <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google" style="flex:1">Google Map</a>
+        <div class="modal-btn-grid">
+            <div class="modal-btn-row-top">
+                <button class="btn-modal-cancel" onclick="closeModal()">取消</button>
+                <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
+            </div>
+            <button class="btn-restart-inline" style="margin:0" onclick="resetApp()">重新通靈</button>
         </div>
-        <button class="btn-restart" style="margin:0" onclick="resetApp()">🔄 重新開始</button>
     </div>
 </div>
 
@@ -105,20 +109,60 @@
 <script>
 const data = [
     {name:"華陽豆漿", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"街口飯糰", price:"100以下", time:"早", dist:10, type:"無"},
+    {name:"白鳥餐點店", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"長江早餐店", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"Q Burger", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"維亞歐式早餐", price:"100~200", time:"早", dist:5, type:"無"},
+    {name:"巴特手作晨食", price:"100~200", time:"早", dist:10, type:"無"},
+    {name:"阿寶 A-Bao", price:"100以下", time:"早", dist:5, type:"無"},
+    {name:"三豆二麥", price:"100以下", time:"早", dist:10, type:"無"},
+    {name:"餅霸天下", price:"100以下", time:"早", dist:15, type:"無"},
+    {name:"食鮮森鐵板燒", price:"100~200", time:"午晚", dist:10, type:"中式"},
+    {name:"蓋飯家族", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"飽米便當", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {name:"阿章控肉飯", price:"100以下", time:"午晚", dist:5, type:"中式"},
     {name:"彰化美香牛哥", price:"100~200", time:"午晚", dist:5, type:"中式"},
     {name:"聞香牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"大王牛肉麵", price:"100~200", time:"午", dist:15, type:"中式"},
+    {name:"鲁肉擔仔麵", price:"100以下", time:"午晚", dist:5, type:"中式"},
     {name:"異式義式麵食", price:"100~200", time:"午晚", dist:5, type:"西式"},
     {name:"老夫子牛排", price:"100~200", time:"午晚", dist:5, type:"西式"},
-    {name:"九湯屋拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {name:"帕司咖啡Pass", price:"100~200", time:"午晚", dist:5, type:"西式"},
+    {name:"牛太郎燒肉丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
+    {name:"千菊丸拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
     {name:"原山拉麵", price:"100~200", time:"午晚", dist:5, type:"日式"},
+    {name:"九湯屋拉麵", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {name:"拉麵小徑", price:"200以上", time:"晚", dist:10, type:"日式"},
+    {name:"麵屋三金", price:"100以下", time:"午晚", dist:5, type:"日式"},
     {name:"狐狸工頭", price:"200以上", time:"午晚", dist:5, type:"日式"},
-    {name:"阿章控肉飯", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"蔡媽媽蔥油餅", price:"100以下", time:"點", dist:5, type:"無"}
+    {name:"丸盛拉麵屋", price:"100~200", time:"午晚", dist:10, type:"日式"},
+    {name:"福田家咖哩", price:"100~200", time:"午晚", dist:15, type:"日式"},
+    {name:"雁歸雞湯拉麵", price:"200以上", time:"午晚", dist:10, type:"日式"},
+    {name:"BVKcurry", price:"200以上", time:"午晚", dist:10, type:"日式"},
+    {name:"雲南小吃", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"大思鄉臭臭鍋", price:"100~200", time:"午晚", dist:5, type:"中式"},
+    {name:"四海豆漿", price:"100~200", time:"午晚", dist:10, type:"中式"},
+    {name:"寶記港式飲茶", price:"100~200", time:"晚", dist:15, type:"中式"},
+    {name:"億品鍋", price:"200以上", time:"午晚", dist:10, type:"中式"},
+    {name:"八方雲集", price:"100以下", time:"午晚", dist:15, type:"中式"},
+    {name:"紅嬌炸粿", price:"100以下", time:"午晚", dist:5, type:"中式"},
+    {name:"火鍋世家", price:"200以上", time:"午晚", dist:5, type:"中式"},
+    {name:"微笑冰果室", price:"100~200", time:"午晚", dist:15, type:"中式"},
+    {name:"徐媽媽蔥油餅", price:"100以下", time:"點", dist:5, type:"無"},
+    {name:"珍北平餡餅", price:"100以下", time:"點", dist:5, type:"無"},
+    {name:"炸職人", price:"100~200", time:"點", dist:5, type:"無"},
+    {name:"龍哥雞排", price:"100~200", time:"點", dist:10, type:"無"},
+    {name:"南郭鹹酥雞", price:"100~200", time:"點", dist:5, type:"無"},
+    {name:"中山豆漿", price:"100以下", time:"點", dist:10, type:"無"},
+    {name:"塩彡", price:"100~200", time:"點", dist:10, type:"無"},
+    {name:"鼎豆芋圓", price:"100以下", time:"點", dist:15, type:"無"},
+    {name:"精誠夜市", price:"100~200", time:"點", dist:15, type:"無"}
 ];
 
 let filteredList = [];
 let isExcludeMode = false;
-let drawCount = 0; // 追蹤抽籤次數
+let drawCount = 0;
 
 function toggleTypeSelect() {
     const t = document.getElementById('timeSelect').value;
@@ -143,7 +187,7 @@ function renderList() {
     const res = document.getElementById('resultArea');
     res.style.display = "block";
     if (filteredList.length === 0) {
-        res.innerHTML = "<b>😭 列表中已無店家！請重設。</b>";
+        res.innerHTML = "<b>😭 列表中已無符合條件的店家！</b>";
         return;
     }
     res.innerHTML = `<b>✨ 搜尋結果 (${filteredList.length})：</b><br><br>` + 
@@ -167,7 +211,6 @@ function handleItemClick(el) {
 function drawWithAnimation() {
     if (filteredList.length === 0) return;
 
-    // 如果已經抽了 3 次，再次點擊就發火
     if (drawCount >= 3) {
         document.getElementById('angryModal').style.display = 'flex';
         return;
@@ -194,11 +237,10 @@ function drawWithAnimation() {
 }
 
 function finalizeDraw() {
-    drawCount++; // 增加次數
+    drawCount++;
     document.getElementById('actionArea').style.opacity = "1";
     document.getElementById('randBtn').disabled = false;
     
-    // 一次只抽 1 個
     const randomIndex = Math.floor(Math.random() * filteredList.length);
     const pick = filteredList[randomIndex];
     
@@ -219,9 +261,9 @@ function toggleExcludeMode() {
     const hint = document.getElementById('hintText');
 
     if (isExcludeMode) {
-        btn.innerText = "❌ 確認剔除所選";
+        btn.innerText = "❌ 確認剔除所選項目";
         btn.style.background = "#e74c3c";
-        hint.innerText = "🚫 排除模式：勾選不想吃的項目。";
+        hint.innerText = "🚫 排除模式：勾選不想吃的，再按一次按鈕剔除。";
         document.getElementById('confirmBtn').style.display = "none";
         document.getElementById('randBtn').style.display = "none";
     } else {
@@ -240,10 +282,10 @@ function toggleExcludeMode() {
 
 function confirmSelection() {
     const checked = document.querySelector('.select-check:checked');
-    if (!checked) { alert("請先選一個！"); return; }
+    if (!checked) { alert("請先從列表中勾選一家餐廳！"); return; }
     const name = checked.getAttribute('data-name');
     document.getElementById('modalRestaurantName').textContent = name;
-    document.getElementById('modalGoogleLink').href = `http://googleusercontent.com/maps.google.com/?q=${encodeURIComponent(name)}`;
+    document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
     document.getElementById('confirmModal').style.display = 'flex';
 }
 
@@ -256,9 +298,18 @@ function resetApp() {
     document.getElementById('resultArea').style.display = "none";
     document.getElementById('resultArea').innerHTML = "";
     document.getElementById('actionArea').style.display = "none";
+    
     filteredList = [];
     isExcludeMode = false;
     drawCount = 0;
+    
+    // 重置按鈕顯示狀態
+    const btn = document.getElementById('excludeBtn');
+    btn.innerText = "🚫 排除名單模式";
+    btn.style.background = "#777";
+    document.getElementById('confirmBtn').style.display = "block";
+    document.getElementById('randBtn').style.display = "block";
+    document.getElementById('hintText').innerText = "🤔 決定好了嗎？";
 }
 </script>
 </body>
