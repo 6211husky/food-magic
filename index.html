@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>全家逃離指南:通靈點餐機</title>
+    <script src="restaurants.js"></script>
     <style>
         :root { --main-pink: #ff69b4; --dark-pink: #ff1493; --light-pink: #fff0f5; }
         body { font-family: 'Segoe UI', sans-serif; background: #fff0f5; display: flex; justify-content: center; padding: 20px; min-height: 100vh; margin: 0; }
@@ -112,79 +113,7 @@
 </div>
 
 <script>
-const data = [
-    // ================= 早餐類 =================
-    // 【距離 5 分鐘】
-    {name:"華陽豆漿", price:"100以下", time:"早", dist:5, type:"無"}, 
-    {name:"白鳥餐點店", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"長江早餐店", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"Q Burger", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"阿寶 A-Bao", price:"100以下", time:"早", dist:5, type:"無"},
-    {name:"維亞歐式早餐", price:"100~200", time:"早", dist:5, type:"無"},
-    // 【距離 10 分鐘】
-    {name:"街口飯糰", price:"100以下", time:"早", dist:10, type:"無"},
-    {name:"三豆二麥", price:"100以下", time:"早", dist:10, type:"無"},
-    {name:"巴特手作晨食", price:"100~200", time:"早", dist:10, type:"無"},
-    // 【距離 15 分鐘】
-    {name:"餅霸天下", price:"100以下", time:"早晚", dist:15, type:"中式"},
-
-    // ================= 正餐類 (午/晚) =================
-    // 【距離 5 分鐘】
-    {name:"東方滷味", price:"100以下", time:"午晚點", dist:5, type:"中式"},
-    {name:"宮本武丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
-    {name:"飽米便當", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"阿章爌肉飯", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"鲁肉擔仔麵", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"麵屋三金", price:"100以下", time:"午晚", dist:5, type:"日式"},
-    {name:"九湯屋拉麵", price:"100~200", time:"晚", dist:5, type:"日式"},
-    {name:"紅嬌炸粿", price:"100以下", time:"晚點", dist:5, type:"中式"},
-    {name:"彰化美香牛哥", price:"100~200", time:"午晚", dist:5, type:"中式"},
-    {name:"異式義式麵食", price:"100~200", time:"午晚", dist:5, type:"西式"},
-    {name:"老夫子牛排", price:"100~200", time:"午晚", dist:5, type:"西式"},
-    {name:"帕司咖啡Pass", price:"100~200", time:"早午點", dist:5, type:"西式"},
-    {name:"牛太郎燒肉丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
-    {name:"原山拉麵", price:"100~200", time:"午晚", dist:5, type:"日式"},
-    {name:"大思鄉臭臭鍋", price:"100~200", time:"午晚", dist:5, type:"中式"},
-    {name:"狐狸工頭", price:"200以上", time:"午晚", dist:5, type:"日式"},
-    {name:"火鍋世家", price:"200以上", time:"午晚", dist:5, type:"中式"},
-    {name:"天皇日式烤肉飯", price:"100以下", time:"午晚", dist:10, type:"日式"},
-    {name:"釜山韓式料理", price:"100~200", time:"午晚", dist:10, type:"韓式"},
-    {name:"Ruby日式廚房", price:"100~200", time:"午晚", dist:10, type:"日式"},
-    {name:"黃燜雞米飯", price:"100~200", time:"午晚", dist:10, type:"中式"},
-    // 【距離 10 分鐘】
-    {name:"千菊丸拉麵", price:"100~200", time:"晚", dist:10, type:"日式"},
-    {name:"丸盛拉麵屋", price:"100~200", time:"午晚", dist:10, type:"日式"},
-    {name:"四海豆漿", price:"100以下", time:"早晚", dist:10, type:"中式"}, 
-    {name:"拉麵小徑", price:"200以上", time:"晚", dist:10, type:"日式"},
-    {name:"雁歸雞湯拉麵", price:"200以上", time:"午晚", dist:10, type:"日式"},
-    {name:"BVKcurry", price:"200以上", time:"午晚", dist:10, type:"日式"},
-    {name:"億品鍋", price:"200以上", time:"午晚", dist:10, type:"中式"},
-    {name:"食鮮森鐵板燒", price:"200以上", time:"午晚", dist:10, type:"中式"},
-    // 【距離 15 分鐘】
-    {name:"八方雲集", price:"100以下", time:"午晚", dist:15, type:"中式"},
-    {name:"蓋飯家族", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"聞香牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"大王牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"福田家咖哩", price:"100~200", time:"午晚", dist:15, type:"日式"},
-    {name:"雲南小吃", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"寶記港式飲茶", price:"100~200", time:"午晚", dist:15, type:"中式"}, 
-    {name:"微笑冰果室", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"中山豆漿", price:"100以下", time:"早晚", dist:10, type:"中式"},
-
-    // ================= 點心與下午茶/宵夜 (點) =================
-    // 【距離 5 分鐘】
-
-    {name:"阿璋肉圓", price:"100以下", time:"午晚", dist:10, type:"中式"},
-    {name:"徐媽媽蔥油餅", price:"100以下", time:"點", dist:5, type:"無"},
-    {name:"珍北平餡餅", price:"100以下", time:"點", dist:5, type:"無"},
-    {name:"炸職人", price:"100~200", time:"點", dist:5, type:"無"},
-    {name:"南郭鹹酥雞", price:"100~200", time:"點", dist:5, type:"無"},
-    // 【距離 10 分鐘】
-    {name:"龍哥雞排", price:"100~200", time:"點", dist:10, type:"無"},
-    // 【距離 15 分鐘】
-    {name:"鼎豆芋圓", price:"100以下", time:"點", dist:15, type:"無"},
-    {name:"精誠夜市", price:"100~200", time:"晚點", dist:15, type:"中式"}
-];
+// 注意：這裡不再宣告 const data，而是直接讀取外部導入的 restaurants.js 資料
 let filteredList = [];
 let isExcludeMode = false;
 let drawCount = 0;
@@ -234,7 +163,10 @@ function handleItemClick(el) {
 }
 
 function drawWithAnimation() {
-    if (filteredList.length === 0) return;
+    if (filteredList.length === 0) {
+        alert("名單中已經沒有店家可以抽囉！");
+        return;
+    }
 
     if (drawCount >= 3) {
         document.getElementById('angryModal').style.display = 'flex';
@@ -266,8 +198,9 @@ function finalizeDraw() {
     document.getElementById('actionArea').style.opacity = "1";
     document.getElementById('randBtn').disabled = false;
     
+    // 【修復重複抽籤 BUG】：使用 splice 將選中的店家從 filteredList 中徹底移除
     const randomIndex = Math.floor(Math.random() * filteredList.length);
-    const pick = filteredList[randomIndex];
+    const pick = filteredList.splice(randomIndex, 1)[0]; 
     
     const res = document.getElementById('resultArea');
     const drawHtml = `<div style="background:var(--light-pink); padding:10px; margin-top:10px; border-radius:12px; border:2px dashed var(--main-pink);"><b>🔮 第 ${drawCount} 次抽籤結果：</b><br>` + 
@@ -310,10 +243,8 @@ function confirmSelection() {
     if (!checked) { alert("請先從列表中勾選一家餐廳！"); return; }
     const name = checked.getAttribute('data-name');
     
-    // 【修復 BUG 1】把選到的店名，顯示到大框框的標題上
+    // 【修復店名與地圖連結 BUG】：正確代入選中店名，並修正樣版字串語法漏洞
     document.getElementById('modalRestaurantName').textContent = name;
-    
-    // 【修復 BUG 2】換成 Google 官方最標準、跨平台最穩定的搜尋網址格式 (補上 $ 符號)
     document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
     
     document.getElementById('confirmModal').style.display = 'flex';
@@ -333,7 +264,6 @@ function resetApp() {
     isExcludeMode = false;
     drawCount = 0;
     
-    // 重置按鈕顯示狀態
     const btn = document.getElementById('excludeBtn');
     btn.innerText = "🚫 排除名單模式";
     btn.style.background = "#777";
