@@ -113,7 +113,6 @@
 </div>
 
 <script>
-// 注意：這裡不再宣告 const data，而是直接讀取外部導入的 restaurants.js 資料
 let filteredList = [];
 let isExcludeMode = false;
 let drawCount = 0;
@@ -129,6 +128,7 @@ function initialSearch() {
     const p = document.getElementById('priceSelect').value;
     const d = parseInt(document.getElementById('distSelect').value);
     
+    // 使用外部引入的 data 變數
     filteredList = data.filter(r => r.time.includes(t) && (t !== "午" && t !== "晚" || type === "都可" || r.type === type) && (p === "不限" || r.price === p) && r.dist <= d);
     
     drawCount = 0;
@@ -198,7 +198,7 @@ function finalizeDraw() {
     document.getElementById('actionArea').style.opacity = "1";
     document.getElementById('randBtn').disabled = false;
     
-    // 【修復重複抽籤 BUG】：使用 splice 將選中的店家從 filteredList 中徹底移除
+    // 將選中的店家從 filteredList 中徹底移除，避免重複抽到
     const randomIndex = Math.floor(Math.random() * filteredList.length);
     const pick = filteredList.splice(randomIndex, 1)[0]; 
     
@@ -243,7 +243,7 @@ function confirmSelection() {
     if (!checked) { alert("請先從列表中勾選一家餐廳！"); return; }
     const name = checked.getAttribute('data-name');
     
-    // 【修復店名與地圖連結 BUG】：正確代入選中店名，並修正樣版字串語法漏洞
+    // 正確帶入店名，並使用 Google Maps 搜尋 API 確保手機端能開啟 App
     document.getElementById('modalRestaurantName').textContent = name;
     document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
     
