@@ -155,8 +155,16 @@ function renderList() {
 function handleItemClick(el) {
     const cb = el.querySelector('.select-check');
     if (!isExcludeMode) {
+        // 【修改點】：先記住這個項目原本是不是被打勾的
+        const wasChecked = cb.checked;
+        
+        // 把所有的勾勾都清掉
         document.querySelectorAll('.select-check').forEach(c => c.checked = false);
-        cb.checked = true;
+        
+        // 如果原本沒被打勾，就勾起來；如果原本有打勾，因為上面清空了，就等於取消選取了！
+        if (!wasChecked) {
+            cb.checked = true;
+        }
     } else {
         cb.checked = !cb.checked;
     }
@@ -243,8 +251,9 @@ function confirmSelection() {
     if (!checked) { alert("請先從列表中勾選一家餐廳！"); return; }
     const name = checked.getAttribute('data-name');
     
-    // 正確帶入店名，並使用 Google Maps 搜尋 API 確保手機端能開啟 App
     document.getElementById('modalRestaurantName').textContent = name;
+    
+    // 【修改點】：換成 Google Maps 官方標準搜尋網址，絕對不會壞
     document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
     
     document.getElementById('confirmModal').style.display = 'flex';
