@@ -48,13 +48,13 @@ const data = [
     {name:"億品鍋", price:"200以上", time:"午晚", dist:10, type:"中式"},
     {name:"食鮮森鐵板燒", price:"200以上", time:"午晚", dist:10, type:"中式"},
     // 【距離 15 分鐘】
+    {name:"寶記港式麵館", price:"100以下", time:"午晚", dist:15, type:"中式"}, 
     {name:"八方雲集", price:"100以下", time:"午晚", dist:15, type:"中式"},
     {name:"蓋飯家族", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"聞香牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"大王牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"福田家咖哩", price:"100~200", time:"午晚", dist:15, type:"日式"},
     {name:"雲南小吃", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"寶記港式飲茶", price:"100~200", time:"午晚", dist:15, type:"中式"}, 
     {name:"微笑冰果室", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"中山豆漿", price:"100以下", time:"早晚", dist:10, type:"中式"},
 
