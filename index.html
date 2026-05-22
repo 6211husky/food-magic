@@ -39,7 +39,9 @@
         .modal-name { font-size: 20px; font-weight: bold; color: var(--main-pink); margin-bottom: 20px; border: 2px solid var(--light-pink); padding: 15px; border-radius: 12px; }
         
         .modal-btn-grid { display: flex; flex-direction: column; gap: 10px; }
-        .btn-modal-cancel { width: 100%; background: #ccc; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .modal-btn-row-top { display: flex; gap: 10px; }
+        .btn-modal-cancel { flex: 1; background: #ccc; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        .btn-modal-google { flex: 1; background: #34a853; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         
         .angry-text { font-size: 22px; color: #e74c3c; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
 
@@ -111,7 +113,10 @@
     <div class="modal-content">
         <div id="modalRestaurantName" class="modal-name">店名</div>
         <div class="modal-btn-grid">
-            <button class="btn-modal-cancel" onclick="closeModal()">確定</button>
+            <div class="modal-btn-row-top">
+                <button class="btn-modal-cancel" onclick="closeModal()">取消</button>
+                <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
+            </div>
             <button class="btn-restart-inline" style="margin:0" onclick="resetApp()">重新通靈</button>
         </div>
     </div>
@@ -274,6 +279,9 @@ function confirmSelection() {
     const name = checked.getAttribute('data-name');
     
     document.getElementById('modalRestaurantName').textContent = name;
+    // 綁定 Google Map 官方標準 Search API 網址
+    document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
+    
     document.getElementById('confirmModal').style.display = 'flex';
 }
 
