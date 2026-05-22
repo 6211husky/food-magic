@@ -20,7 +20,6 @@ const data = [
     {name:"東方滷味", price:"100以下", time:"午晚點", dist:5, type:"中式"},
     {name:"宮本武丼", price:"100~200", time:"午晚", dist:5, type:"日式"},
     {name:"飽米便當", price:"100以下", time:"午晚", dist:5, type:"中式"},
-    {name:"阿章爌肉飯", price:"100以下", time:"午晚", dist:5, type:"中式"},
     {name:"鲁肉擔仔麵", price:"100以下", time:"午晚", dist:5, type:"中式"},
     {name:"麵屋三金", price:"100以下", time:"午晚", dist:5, type:"日式"},
     {name:"九湯屋拉麵", price:"100~200", time:"晚", dist:5, type:"日式"},
@@ -53,7 +52,7 @@ const data = [
     {name:"蓋飯家族", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"聞香牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"大王牛肉麵", price:"100~200", time:"午晚", dist:15, type:"中式"},
-    {name:"福田家咖哩", price:"100~200", time:"午晚", dist:15, type:"日式"},
+    {name:"福田家咖哩", price:"100~200", time:"午晚", dist:5, type:"日式"},
     {name:"雲南小吃", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"微笑冰果室", price:"100~200", time:"午晚", dist:15, type:"中式"},
     {name:"中山豆漿", price:"100以下", time:"早晚", dist:10, type:"中式"},
@@ -66,8 +65,7 @@ const data = [
     {name:"炸職人", price:"100~200", time:"點", dist:5, type:"無"},
     {name:"南郭鹹酥雞", price:"100~200", time:"點", dist:5, type:"無"},
     // 【距離 10 分鐘】
-    {name:"龍哥雞排", price:"100~200", time:"點", dist:10, type:"無"},
-    {name:"塩彡", price:"100~200", time:"晚點", dist:10, type:"日式"},
+    {name:"龍哥雞排", price:"100~200", time:"點", dist:5, type:"無"},
     // 【距離 15 分鐘】
     {name:"鼎豆芋圓", price:"100以下", time:"點", dist:15, type:"無"},
     {name:"精誠夜市", price:"100~200", time:"晚點", dist:15, type:"中式"}
