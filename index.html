@@ -39,13 +39,10 @@
         .modal-name { font-size: 20px; font-weight: bold; color: var(--main-pink); margin-bottom: 20px; border: 2px solid var(--light-pink); padding: 15px; border-radius: 12px; }
         
         .modal-btn-grid { display: flex; flex-direction: column; gap: 10px; }
-        .modal-btn-row-top { display: flex; gap: 10px; }
-        .btn-modal-cancel { flex: 1; background: #ccc; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-        .btn-modal-google { flex: 1; background: #34a853; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .btn-modal-cancel { width: 100%; background: #ccc; color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
         
         .angry-text { font-size: 22px; color: #e74c3c; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
 
-        /* 新增：意見回饋信箱的樣式 */
         .feedback-text { text-align: center; font-size: 12px; color: #aaa; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ffe4e1; }
         .feedback-text a { color: var(--main-pink); text-decoration: none; font-weight: bold; transition: 0.2s; }
         .feedback-text a:hover { color: var(--dark-pink); text-decoration: underline; }
@@ -88,6 +85,16 @@
     
     <div id="actionArea" style="display:none; text-align:center; margin-top:15px;">
         <div id="hintText" style="font-weight:bold; color:#ff69b4; margin-bottom:10px;">🤔 決定好了嗎？</div>
+        
+        <div id="drawSetup" style="margin-bottom: 12px;">
+            <label style="display:inline-block; margin:0; margin-right:5px; color:var(--dark-pink);">🎲 欲抽數量：</label>
+            <select id="drawNumSelect" style="width:auto; padding:5px 15px; border-radius:8px; display:inline-block; margin:0;">
+                <option value="1" selected>1 家</option>
+                <option value="2">2 家</option>
+                <option value="3">3 家</option>
+            </select>
+        </div>
+
         <div class="btn-row">
             <button id="confirmBtn" class="btn-confirm" onclick="confirmSelection()">✅ 確認勾選</button>
             <button id="randBtn" class="btn-rand" onclick="drawWithAnimation()">🎲 隨便抽</button>
@@ -106,10 +113,7 @@
     <div class="modal-content">
         <div id="modalRestaurantName" class="modal-name">店名</div>
         <div class="modal-btn-grid">
-            <div class="modal-btn-row-top">
-                <button class="btn-modal-cancel" onclick="closeModal()">取消</button>
-                <a id="modalGoogleLink" href="#" target="_blank" class="btn-modal-google">Google Map</a>
-            </div>
+            <button class="btn-modal-cancel" onclick="closeModal()">確定</button>
             <button class="btn-restart-inline" style="margin:0" onclick="resetApp()">重新通靈</button>
         </div>
     </div>
@@ -139,6 +143,9 @@ function initialSearch() {
     const d = parseInt(document.getElementById('distSelect').value);
     
     filteredList = data.filter(r => r.time.includes(t) && (t !== "午" && t !== "晚" || type === "都可" || r.type === type) && (p === "不限" || r.price === p) && r.dist <= d);
+    
+    // 排序：距離由大到小（15分 ➔ 10分 ➔ 5分）
+    filteredList.sort((a, b) => b.dist - a.dist);
     
     drawCount = 0;
     renderList();
@@ -210,15 +217,26 @@ function finalizeDraw() {
     document.getElementById('actionArea').style.opacity = "1";
     document.getElementById('randBtn').disabled = false;
     
-    const randomIndex = Math.floor(Math.random() * filteredList.length);
-    const pick = filteredList.splice(randomIndex, 1)[0]; 
+    // 取得使用者想要抽幾家 (如果剩下的不夠抽，就只抽剩下的數量)
+    let numToDraw = parseInt(document.getElementById('drawNumSelect').value);
+    numToDraw = Math.min(numToDraw, filteredList.length);
+    
+    let pickedItemsHtml = "";
+    
+    // 【修改點】：使用迴圈一次抽出多個店家，並組裝 HTML
+    for(let i = 0; i < numToDraw; i++) {
+        const randomIndex = Math.floor(Math.random() * filteredList.length);
+        const pick = filteredList.splice(randomIndex, 1)[0]; 
+        
+        pickedItemsHtml += `
+            <div class="list-item" onclick="handleItemClick(this)">
+                <input type="checkbox" class="select-check" data-name="${pick.name}">
+                <div class="list-item-content">➡️ ${pick.name}</div>
+            </div>`;
+    }
     
     const res = document.getElementById('resultArea');
-    const drawHtml = `<div style="background:var(--light-pink); padding:10px; margin-top:10px; border-radius:12px; border:2px dashed var(--main-pink);"><b>🔮 第 ${drawCount} 次抽籤結果：</b><br>` + 
-        `<div class="list-item" onclick="handleItemClick(this)">
-            <input type="checkbox" class="select-check" data-name="${pick.name}">
-            <div class="list-item-content">➡️ ${pick.name}</div>
-        </div></div>`;
+    const drawHtml = `<div style="background:var(--light-pink); padding:10px; margin-top:10px; border-radius:12px; border:2px dashed var(--main-pink);"><b>🔮 第 ${drawCount} 次抽籤結果：</b><br>` + pickedItemsHtml + `</div>`;
     
     res.innerHTML += drawHtml;
     res.scrollTop = res.scrollHeight;
@@ -228,6 +246,7 @@ function toggleExcludeMode() {
     isExcludeMode = !isExcludeMode;
     const btn = document.getElementById('excludeBtn');
     const hint = document.getElementById('hintText');
+    const drawSetup = document.getElementById('drawSetup');
 
     if (isExcludeMode) {
         btn.innerText = "❌ 確認剔除所選項目";
@@ -235,6 +254,7 @@ function toggleExcludeMode() {
         hint.innerText = "🚫 排除模式：勾選不想吃的，再按一次按鈕剔除。";
         document.getElementById('confirmBtn').style.display = "none";
         document.getElementById('randBtn').style.display = "none";
+        if (drawSetup) drawSetup.style.display = "none"; // 排除模式下隱藏抽籤數量選單
     } else {
         const checked = document.querySelectorAll('.select-check:checked');
         const namesToRemove = Array.from(checked).map(c => c.getAttribute('data-name'));
@@ -245,6 +265,7 @@ function toggleExcludeMode() {
         hint.innerText = "🤔 決定好了嗎？";
         document.getElementById('confirmBtn').style.display = "block";
         document.getElementById('randBtn').style.display = "block";
+        if (drawSetup) drawSetup.style.display = "block"; // 恢復顯示
         renderList();
     }
 }
@@ -255,10 +276,6 @@ function confirmSelection() {
     const name = checked.getAttribute('data-name');
     
     document.getElementById('modalRestaurantName').textContent = name;
-    
-    // 徹底修復：換成官方標準 Search API 網址
-    document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
-    
     document.getElementById('confirmModal').style.display = 'flex';
 }
 
@@ -276,11 +293,16 @@ function resetApp() {
     isExcludeMode = false;
     drawCount = 0;
     
+    // 恢復抽籤數量預設為 1
+    document.getElementById('drawNumSelect').value = "1";
+    
     const btn = document.getElementById('excludeBtn');
     btn.innerText = "🚫 排除名單模式";
     btn.style.background = "#777";
     document.getElementById('confirmBtn').style.display = "block";
     document.getElementById('randBtn').style.display = "block";
+    const drawSetup = document.getElementById('drawSetup');
+    if(drawSetup) drawSetup.style.display = "block";
     document.getElementById('hintText').innerText = "🤔 決定好了嗎？";
 }
 </script>
