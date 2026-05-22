@@ -44,8 +44,6 @@
         .angry-text { font-size: 22px; color: #e74c3c; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
 
         .feedback-text { text-align: center; font-size: 12px; color: #aaa; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ffe4e1; }
-        .feedback-text a { color: var(--main-pink); text-decoration: none; font-weight: bold; transition: 0.2s; }
-        .feedback-text a:hover { color: var(--dark-pink); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -105,7 +103,7 @@
 
     <div class="feedback-text">
         💡 遇到 Bug 或有推薦的美食？<br>
-        <a href="mailto:s1454053@gm.ncue.edu.tw?subject=通靈點餐機%20意見回饋">📬 點此寄信給開發者</a>
+        開發者信箱：s1454053@gm.ncue.edu.tw
     </div>
 </div>
 
@@ -120,9 +118,9 @@
 </div>
 
 <div id="angryModal" class="modal-overlay">
-    <div class="feedback-text">
-        💡 遇到 Bug 或有推薦的美食？<br>
-        開發者信箱：s1454053@gm.ncue.edu.tw
+    <div class="modal-content">
+        <div class="angry-text">😡<br>這麼難搞就吃全家啦！！</div>
+        <button class="btn-main" style="margin:0" onclick="resetApp()">🔄 重新通靈 (重置)</button>
     </div>
 </div>
 
@@ -223,7 +221,7 @@ function finalizeDraw() {
     
     let pickedItemsHtml = "";
     
-    // 【修改點】：使用迴圈一次抽出多個店家，並組裝 HTML
+    // 使用迴圈一次抽出多個店家，並組裝 HTML
     for(let i = 0; i < numToDraw; i++) {
         const randomIndex = Math.floor(Math.random() * filteredList.length);
         const pick = filteredList.splice(randomIndex, 1)[0]; 
