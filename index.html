@@ -8,7 +8,7 @@
     <style>
         :root { --main-pink: #ff69b4; --dark-pink: #ff1493; --light-pink: #fff0f5; }
         body { font-family: 'Segoe UI', sans-serif; background: #fff0f5; display: flex; justify-content: center; padding: 20px; min-height: 100vh; margin: 0; }
-        .app-card { background: white; width: 100%; max-width: 400px; border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(255,105,180,0.2); }
+        .app-card { background: white; width: 100%; max-width: 400px; border-radius: 25px; padding: 25px; box-shadow: 0 15px 35px rgba(255,105,180,0.2); position: relative; }
         h2 { text-align: center; color: var(--main-pink); margin: 0; font-size: 24px; }
         .sub { text-align: center; color: #ffb6c1; font-size: 13px; margin-bottom: 20px; }
         
@@ -44,6 +44,11 @@
         .btn-modal-google { flex: 1; background: #34a853; color: white; border: none; padding: 10px; border-radius: 10px; font-weight: bold; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         
         .angry-text { font-size: 22px; color: #e74c3c; font-weight: bold; margin-bottom: 20px; line-height: 1.5; }
+
+        /* 新增：意見回饋信箱的樣式 */
+        .feedback-text { text-align: center; font-size: 12px; color: #aaa; margin-top: 25px; padding-top: 15px; border-top: 1px dashed #ffe4e1; }
+        .feedback-text a { color: var(--main-pink); text-decoration: none; font-weight: bold; transition: 0.2s; }
+        .feedback-text a:hover { color: var(--dark-pink); text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -90,6 +95,11 @@
             <button class="btn-restart-inline" onclick="resetApp()">🔄 重新通靈</button>
         </div>
     </div>
+
+    <div class="feedback-text">
+        💡 遇到 Bug 或有推薦的美食？<br>
+        <a href="mailto:s1454053@gm.ncue.edu.tw?subject=通靈點餐機%20意見回饋">📬 點此寄信給開發者</a>
+    </div>
 </div>
 
 <div id="confirmModal" class="modal-overlay">
@@ -128,7 +138,6 @@ function initialSearch() {
     const p = document.getElementById('priceSelect').value;
     const d = parseInt(document.getElementById('distSelect').value);
     
-    // 使用外部引入的 data 變數
     filteredList = data.filter(r => r.time.includes(t) && (t !== "午" && t !== "晚" || type === "都可" || r.type === type) && (p === "不限" || r.price === p) && r.dist <= d);
     
     drawCount = 0;
@@ -155,13 +164,8 @@ function renderList() {
 function handleItemClick(el) {
     const cb = el.querySelector('.select-check');
     if (!isExcludeMode) {
-        // 【修改點】：先記住這個項目原本是不是被打勾的
         const wasChecked = cb.checked;
-        
-        // 把所有的勾勾都清掉
         document.querySelectorAll('.select-check').forEach(c => c.checked = false);
-        
-        // 如果原本沒被打勾，就勾起來；如果原本有打勾，因為上面清空了，就等於取消選取了！
         if (!wasChecked) {
             cb.checked = true;
         }
@@ -206,7 +210,6 @@ function finalizeDraw() {
     document.getElementById('actionArea').style.opacity = "1";
     document.getElementById('randBtn').disabled = false;
     
-    // 將選中的店家從 filteredList 中徹底移除，避免重複抽到
     const randomIndex = Math.floor(Math.random() * filteredList.length);
     const pick = filteredList.splice(randomIndex, 1)[0]; 
     
@@ -253,7 +256,7 @@ function confirmSelection() {
     
     document.getElementById('modalRestaurantName').textContent = name;
     
-    // 【修改點】：換成 Google Maps 官方標準搜尋網址，絕對不會壞
+    // 徹底修復：換成官方標準 Search API 網址
     document.getElementById('modalGoogleLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}`;
     
     document.getElementById('confirmModal').style.display = 'flex';
